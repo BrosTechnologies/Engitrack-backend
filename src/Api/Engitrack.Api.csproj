@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Projects\Engitrack.Projects.Infrastructure\Engitrack.Projects.Infrastructure.csproj" />
+    <ProjectReference Include="..\Projects\Engitrack.Projects.Application\Engitrack.Projects.Application.csproj" />
   </ItemGroup>
 
 </Project>

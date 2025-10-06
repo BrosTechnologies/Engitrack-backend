@@ -220,5 +220,3 @@ El proyecto está estructurado para facilitar el desarrollo colaborativo:
 - Extensible para nuevos contextos
 
 ---
-
-**Desarrollado con ❤️ usando .NET 9 y Clean Architecture**
