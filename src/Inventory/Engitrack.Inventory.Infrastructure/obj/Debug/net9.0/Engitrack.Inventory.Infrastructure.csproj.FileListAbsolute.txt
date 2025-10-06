@@ -1,0 +1,12 @@
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Infrastructure\bin\Debug\net9.0\Engitrack.Inventory.Infrastructure.deps.json
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Infrastructure\bin\Debug\net9.0\Engitrack.Inventory.Infrastructure.dll
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Infrastructure\bin\Debug\net9.0\Engitrack.Inventory.Infrastructure.pdb
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Infrastructure\obj\Debug\net9.0\Engitrack.Inventory.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Infrastructure\obj\Debug\net9.0\Engitrack.Inventory.Infrastructure.AssemblyInfoInputs.cache
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Infrastructure\obj\Debug\net9.0\Engitrack.Inventory.Infrastructure.AssemblyInfo.cs
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Infrastructure\obj\Debug\net9.0\Engitrack.Inventory.Infrastructure.csproj.CoreCompileInputs.cache
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Infrastructure\obj\Debug\net9.0\Engitrack.Inventory.Infrastructure.dll
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Infrastructure\obj\Debug\net9.0\refint\Engitrack.Inventory.Infrastructure.dll
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Infrastructure\obj\Debug\net9.0\Engitrack.Inventory.Infrastructure.pdb
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Infrastructure\obj\Debug\net9.0\ref\Engitrack.Inventory.Infrastructure.dll
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Infrastructure\obj\Debug\net9.0\Engitrack.Inventory.Infrastructure.csproj.AssemblyReference.cache

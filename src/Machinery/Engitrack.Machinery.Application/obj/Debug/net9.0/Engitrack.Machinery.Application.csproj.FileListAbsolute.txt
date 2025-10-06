@@ -1,0 +1,11 @@
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\bin\Debug\net9.0\Engitrack.Machinery.Application.deps.json
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\bin\Debug\net9.0\Engitrack.Machinery.Application.dll
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\bin\Debug\net9.0\Engitrack.Machinery.Application.pdb
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net9.0\Engitrack.Machinery.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net9.0\Engitrack.Machinery.Application.AssemblyInfoInputs.cache
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net9.0\Engitrack.Machinery.Application.AssemblyInfo.cs
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net9.0\Engitrack.Machinery.Application.csproj.CoreCompileInputs.cache
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net9.0\Engitrack.Machinery.Application.dll
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net9.0\refint\Engitrack.Machinery.Application.dll
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net9.0\Engitrack.Machinery.Application.pdb
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net9.0\ref\Engitrack.Machinery.Application.dll

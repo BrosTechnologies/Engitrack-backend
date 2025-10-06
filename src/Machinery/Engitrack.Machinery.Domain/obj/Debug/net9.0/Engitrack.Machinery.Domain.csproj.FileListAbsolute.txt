@@ -1,0 +1,15 @@
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\bin\Debug\net9.0\Engitrack.Machinery.Domain.deps.json
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\bin\Debug\net9.0\Engitrack.Machinery.Domain.dll
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\bin\Debug\net9.0\Engitrack.Machinery.Domain.pdb
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\bin\Debug\net9.0\Engitrack.BuildingBlocks.dll
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\bin\Debug\net9.0\Engitrack.BuildingBlocks.pdb
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\obj\Debug\net9.0\Engitrack.Machinery.Domain.csproj.AssemblyReference.cache
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\obj\Debug\net9.0\Engitrack.Machinery.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\obj\Debug\net9.0\Engitrack.Machinery.Domain.AssemblyInfoInputs.cache
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\obj\Debug\net9.0\Engitrack.Machinery.Domain.AssemblyInfo.cs
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\obj\Debug\net9.0\Engitrack.Machinery.Domain.csproj.CoreCompileInputs.cache
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\obj\Debug\net9.0\Engitrac.A88AB79D.Up2Date
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\obj\Debug\net9.0\Engitrack.Machinery.Domain.dll
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\obj\Debug\net9.0\refint\Engitrack.Machinery.Domain.dll
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\obj\Debug\net9.0\Engitrack.Machinery.Domain.pdb
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Domain\obj\Debug\net9.0\ref\Engitrack.Machinery.Domain.dll

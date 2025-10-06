@@ -1,0 +1,15 @@
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\obj\Debug\net9.0\Engitrack.Workers.Domain.csproj.AssemblyReference.cache
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\obj\Debug\net9.0\Engitrack.Workers.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\obj\Debug\net9.0\Engitrack.Workers.Domain.AssemblyInfoInputs.cache
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\obj\Debug\net9.0\Engitrack.Workers.Domain.AssemblyInfo.cs
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\obj\Debug\net9.0\Engitrack.Workers.Domain.csproj.CoreCompileInputs.cache
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\bin\Debug\net9.0\Engitrack.Workers.Domain.deps.json
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\bin\Debug\net9.0\Engitrack.Workers.Domain.dll
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\bin\Debug\net9.0\Engitrack.Workers.Domain.pdb
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\bin\Debug\net9.0\Engitrack.BuildingBlocks.dll
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\bin\Debug\net9.0\Engitrack.BuildingBlocks.pdb
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\obj\Debug\net9.0\Engitrac.0AE716FE.Up2Date
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\obj\Debug\net9.0\Engitrack.Workers.Domain.dll
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\obj\Debug\net9.0\refint\Engitrack.Workers.Domain.dll
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\obj\Debug\net9.0\Engitrack.Workers.Domain.pdb
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Domain\obj\Debug\net9.0\ref\Engitrack.Workers.Domain.dll

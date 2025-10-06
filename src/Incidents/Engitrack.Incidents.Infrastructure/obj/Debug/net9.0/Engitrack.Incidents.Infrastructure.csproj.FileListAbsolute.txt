@@ -1,0 +1,12 @@
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\bin\Debug\net9.0\Engitrack.Incidents.Infrastructure.deps.json
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\bin\Debug\net9.0\Engitrack.Incidents.Infrastructure.dll
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\bin\Debug\net9.0\Engitrack.Incidents.Infrastructure.pdb
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\Engitrack.Incidents.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\Engitrack.Incidents.Infrastructure.AssemblyInfoInputs.cache
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\Engitrack.Incidents.Infrastructure.AssemblyInfo.cs
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\Engitrack.Incidents.Infrastructure.csproj.CoreCompileInputs.cache
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\Engitrack.Incidents.Infrastructure.dll
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\refint\Engitrack.Incidents.Infrastructure.dll
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\Engitrack.Incidents.Infrastructure.pdb
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\ref\Engitrack.Incidents.Infrastructure.dll
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\Engitrack.Incidents.Infrastructure.csproj.AssemblyReference.cache
