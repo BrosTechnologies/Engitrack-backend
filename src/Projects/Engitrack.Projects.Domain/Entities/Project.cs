@@ -43,6 +43,15 @@ public class Project : AggregateRoot
         MarkAsUpdated();
     }
 
+    public void SetEndDate(DateOnly? endDate)
+    {
+        if (endDate.HasValue && endDate < StartDate)
+            throw new ArgumentException("EndDate cannot be before StartDate", nameof(endDate));
+
+        EndDate = endDate;
+        MarkAsUpdated();
+    }
+
     public void Pause()
     {
         if (Status == ProjectStatus.COMPLETED)

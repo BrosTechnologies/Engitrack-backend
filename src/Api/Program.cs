@@ -1,11 +1,17 @@
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
 using Engitrack.Projects.Infrastructure.Persistence;
+using Engitrack.Projects.Application.Projects.Dtos;
+using Engitrack.Projects.Application.Projects.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<ProjectsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
+
+// Add FluentValidation
+builder.Services.AddScoped<IValidator<CreateProjectRequest>, CreateProjectRequestValidator>();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -49,33 +55,82 @@ app.MapGet("/api/health", () => Results.Ok(new { Status = "Healthy", Timestamp =
 // Projects endpoints
 app.MapGet("/api/projects", async (ProjectsDbContext context) =>
 {
-    var projects = await context.Projects.ToListAsync();
-    return Results.Ok(projects);
+    var projects = await context.Projects
+        .Include(p => p.Tasks)
+        .ToListAsync();
+    
+    var response = projects.Select(p => new ProjectResponse(
+        p.Id,
+        p.Name,
+        p.StartDate,
+        p.EndDate,
+        p.Budget,
+        p.Status.ToString(),
+        p.OwnerUserId,
+        p.Tasks.Select(t => new ProjectTaskDto(t.Id, t.Title, t.Status.ToString(), t.DueDate))
+    ));
+    
+    return Results.Ok(response);
 })
 .WithName("GetProjects")
-.WithTags("Projects");
+.WithTags("Projects")
+.Produces<IEnumerable<ProjectResponse>>(200);
 
-app.MapPost("/api/projects", async (CreateProjectRequest request, ProjectsDbContext context) =>
+app.MapPost("/api/projects", async (CreateProjectRequest request, IValidator<CreateProjectRequest> validator, ProjectsDbContext context) =>
 {
-    // Simple validation
-    if (string.IsNullOrWhiteSpace(request.Name))
-        return Results.BadRequest("Name is required");
+    // Validate request
+    var validationResult = await validator.ValidateAsync(request);
+    if (!validationResult.IsValid)
+    {
+        return Results.BadRequest(validationResult.Errors.Select(e => new { 
+            Property = e.PropertyName, 
+            Error = e.ErrorMessage 
+        }));
+    }
 
+    // Create project
     var project = new Engitrack.Projects.Domain.Entities.Project(
         request.Name,
-        DateOnly.FromDateTime(request.StartDate),
+        request.StartDate,
         request.OwnerUserId,
         request.Budget);
+
+    // Set EndDate if provided and valid
+    if (request.EndDate.HasValue)
+    {
+        project.SetEndDate(request.EndDate);
+    }
+
+    // Add tasks if provided
+    if (request.Tasks != null)
+    {
+        foreach (var taskDto in request.Tasks)
+        {
+            project.AddTask(taskDto.Title, taskDto.DueDate);
+        }
+    }
 
     context.Projects.Add(project);
     await context.SaveChangesAsync();
 
-    return Results.Created($"/api/projects/{project.Id}", project);
+    // Map to response
+    var response = new ProjectResponse(
+        project.Id,
+        project.Name,
+        project.StartDate,
+        project.EndDate,
+        project.Budget,
+        project.Status.ToString(),
+        project.OwnerUserId,
+        project.Tasks.Select(t => new ProjectTaskDto(t.Id, t.Title, t.Status.ToString(), t.DueDate))
+    );
+
+    return Results.Created($"/api/projects/{project.Id}", response);
 })
 .WithName("CreateProject")
-.WithTags("Projects");
+.WithTags("Projects")
+.Accepts<CreateProjectRequest>("application/json")
+.Produces<ProjectResponse>(201)
+.Produces(400);
 
 app.Run();
-
-// DTOs
-public record CreateProjectRequest(string Name, DateTime StartDate, Guid OwnerUserId, decimal? Budget);

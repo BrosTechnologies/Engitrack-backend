@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Engitrack.Incidents.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1a4b16fa7084066c675cf0ddd2b173699a17a3a3")]
 [assembly: System.Reflection.AssemblyProductAttribute("Engitrack.Incidents.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Engitrack.Incidents.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

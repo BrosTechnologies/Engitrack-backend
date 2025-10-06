@@ -176,3 +176,4 @@ D:\APP MOVIL\BACKEND\src\Api\bin\Debug\net9.0\Engitrack.Projects.Domain.pdb
 D:\APP MOVIL\BACKEND\src\Api\obj\Debug\net9.0\Engitrack.Api.csproj.AssemblyReference.cache
 D:\APP MOVIL\BACKEND\src\Api\obj\Debug\net9.0\Engitrack.Api.MvcApplicationPartsAssemblyInfo.cs
 D:\APP MOVIL\BACKEND\src\Api\obj\Debug\net9.0\Engitrac.B6A396CD.Up2Date
+D:\APP MOVIL\BACKEND\src\Api\bin\Debug\net9.0\FluentValidation.DependencyInjectionExtensions.dll

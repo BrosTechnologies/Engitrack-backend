@@ -60,6 +60,23 @@
           }
         }
       },
+      "FluentValidation.DependencyInjectionExtensions/12.0.0": {
+        "type": "package",
+        "dependencies": {
+          "FluentValidation": "12.0.0",
+          "Microsoft.Extensions.Dependencyinjection.Abstractions": "2.1.0"
+        },
+        "compile": {
+          "lib/net8.0/FluentValidation.DependencyInjectionExtensions.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/FluentValidation.DependencyInjectionExtensions.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Humanizer.Core/2.14.1": {
         "type": "package",
         "compile": {
@@ -1704,6 +1721,7 @@
           "Engitrack.BuildingBlocks": "1.0.0",
           "Engitrack.Projects.Domain": "1.0.0",
           "FluentValidation": "12.0.0",
+          "FluentValidation.DependencyInjectionExtensions": "12.0.0",
           "MediatR": "13.0.0",
           "MediatR.Extensions.Microsoft.DependencyInjection": "11.1.0"
         },
@@ -1796,6 +1814,21 @@
         "fluentvalidation.nuspec",
         "lib/net8.0/FluentValidation.dll",
         "lib/net8.0/FluentValidation.xml"
+      ]
+    },
+    "FluentValidation.DependencyInjectionExtensions/12.0.0": {
+      "sha512": "B28fBRL1UjhGsBC8fwV6YBZosh+SiU1FxdD7l7p5dGPgRlVI7UnM+Lgzmg+unZtV1Zxzpaw96UY2MYfMaAd8cg==",
+      "type": "package",
+      "path": "fluentvalidation.dependencyinjectionextensions/12.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "fluent-validation-icon.png",
+        "fluentvalidation.dependencyinjectionextensions.12.0.0.nupkg.sha512",
+        "fluentvalidation.dependencyinjectionextensions.nuspec",
+        "lib/net8.0/FluentValidation.DependencyInjectionExtensions.dll",
+        "lib/net8.0/FluentValidation.DependencyInjectionExtensions.xml"
       ]
     },
     "Humanizer.Core/2.14.1": {
@@ -4987,6 +5020,7 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
+      "Engitrack.Projects.Application >= 1.0.0",
       "Engitrack.Projects.Infrastructure >= 1.0.0",
       "Microsoft.EntityFrameworkCore.Design >= 9.0.9",
       "Microsoft.EntityFrameworkCore.SqlServer >= 9.0.9",
@@ -5018,6 +5052,9 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
+            "D:\\APP MOVIL\\BACKEND\\src\\Projects\\Engitrack.Projects.Application\\Engitrack.Projects.Application.csproj": {
+              "projectPath": "D:\\APP MOVIL\\BACKEND\\src\\Projects\\Engitrack.Projects.Application\\Engitrack.Projects.Application.csproj"
+            },
             "D:\\APP MOVIL\\BACKEND\\src\\Projects\\Engitrack.Projects.Infrastructure\\Engitrack.Projects.Infrastructure.csproj": {
               "projectPath": "D:\\APP MOVIL\\BACKEND\\src\\Projects\\Engitrack.Projects.Infrastructure\\Engitrack.Projects.Infrastructure.csproj"
             }
