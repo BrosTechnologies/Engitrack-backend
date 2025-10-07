@@ -15,6 +15,7 @@ public record UpdateWorkerRequest(
     decimal HourlyRate);
 
 public record CreateAssignmentRequest(
+    Guid WorkerId,
     Guid ProjectId,
     DateOnly StartDate);
 
@@ -22,6 +23,7 @@ public record EndAssignmentRequest(
     DateOnly EndDate);
 
 public record CreateAttendanceRequest(
+    Guid WorkerId,
     Guid ProjectId,
     DateOnly Day,
     string Status,
@@ -53,6 +55,26 @@ public record AttendanceDto(
     Guid Id,
     Guid WorkerId,
     Guid ProjectId,
+    DateOnly Day,
+    TimeOnly? CheckIn,
+    TimeOnly? CheckOut,
+    string Status,
+    string Notes);
+
+public record AssignmentResponse(
+    Guid Id,
+    Guid WorkerId,
+    Guid ProjectId,
+    string ProjectName,
+    DateOnly StartDate,
+    DateOnly? EndDate);
+
+public record AttendanceResponse(
+    Guid Id,
+    Guid WorkerId,
+    string WorkerName,
+    Guid ProjectId,
+    string ProjectName,
     DateOnly Day,
     TimeOnly? CheckIn,
     TimeOnly? CheckOut,

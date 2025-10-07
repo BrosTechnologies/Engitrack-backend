@@ -40,6 +40,9 @@ public class CreateAssignmentRequestValidator : AbstractValidator<CreateAssignme
 {
     public CreateAssignmentRequestValidator()
     {
+        RuleFor(x => x.WorkerId)
+            .NotEmpty().WithMessage("WorkerId is required");
+
         RuleFor(x => x.ProjectId)
             .NotEmpty().WithMessage("ProjectId is required");
 
@@ -52,6 +55,9 @@ public class CreateAttendanceRequestValidator : AbstractValidator<CreateAttendan
 {
     public CreateAttendanceRequestValidator()
     {
+        RuleFor(x => x.WorkerId)
+            .NotEmpty().WithMessage("WorkerId is required");
+
         RuleFor(x => x.ProjectId)
             .NotEmpty().WithMessage("ProjectId is required");
 

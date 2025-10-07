@@ -482,7 +482,14 @@
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "D:\\APP MOVIL\\BACKEND\\src\\BuildingBlocks\\Engitrack.BuildingBlocks.csproj": {
+                "projectPath": "D:\\APP MOVIL\\BACKEND\\src\\BuildingBlocks\\Engitrack.BuildingBlocks.csproj"
+              },
+              "D:\\APP MOVIL\\BACKEND\\src\\Inventory\\Engitrack.Inventory.Domain\\Engitrack.Inventory.Domain.csproj": {
+                "projectPath": "D:\\APP MOVIL\\BACKEND\\src\\Inventory\\Engitrack.Inventory.Domain\\Engitrack.Inventory.Domain.csproj"
+              }
+            }
           }
         },
         "warningProperties": {

@@ -21,6 +21,12 @@ public class ProjectsDbContext : DbContext
     public DbSet<Worker> Workers => Set<Worker>();
     public DbSet<Assignment> Assignments => Set<Assignment>();
     public DbSet<Attendance> Attendances => Set<Attendance>();
+    
+    // Incidents entities
+    public DbSet<Incident> Incidents => Set<Incident>();
+    
+    // Machinery entities
+    public DbSet<Machine> Machines => Set<Machine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -116,6 +122,13 @@ public class ProjectsDbContext : DbContext
             entity.HasIndex(e => e.WorkerId);
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => new { e.WorkerId, e.ProjectId });
+            
+            // Navigation property
+            entity.HasOne(e => e.Worker)
+                .WithMany(w => w.Assignments)
+                .HasForeignKey(e => e.WorkerId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
             entity.Ignore(e => e.DomainEvents);
         });
 
@@ -136,6 +149,74 @@ public class ProjectsDbContext : DbContext
             entity.HasIndex(e => e.WorkerId);
             entity.HasIndex(e => e.ProjectId);
             entity.HasIndex(e => new { e.WorkerId, e.Day }).IsUnique();
+            
+            // Navigation property
+            entity.HasOne(e => e.Worker)
+                .WithMany()
+                .HasForeignKey(e => e.WorkerId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.Ignore(e => e.DomainEvents);
+        });
+
+        // Incident Configuration
+        modelBuilder.Entity<Incident>(entity =>
+        {
+            entity.ToTable("Incidents", "incidents");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()").ValueGeneratedOnAdd();
+            entity.Property(e => e.ProjectId).IsRequired();
+            entity.Property(e => e.Title).HasMaxLength(160).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(2000).IsRequired();
+            entity.Property(e => e.Severity).HasConversion<string>().IsRequired();
+            entity.Property(e => e.Status).HasConversion<string>().IsRequired();
+            entity.Property(e => e.ReportedBy).IsRequired();
+            entity.Property(e => e.ReportedAt).IsRequired();
+            entity.Property(e => e.AssignedTo);
+            entity.Property(e => e.ResolvedAt);
+            entity.Property<byte[]>("RowVersion").IsRowVersion();
+
+            entity.HasIndex(e => e.ProjectId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.Severity);
+            entity.HasIndex(e => new { e.ProjectId, e.Status });
+            
+            // Navigation property
+            entity.HasOne(e => e.Project)
+                .WithMany()
+                .HasForeignKey(e => e.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.Ignore(e => e.DomainEvents);
+        });
+
+        // Machine Configuration
+        modelBuilder.Entity<Machine>(entity =>
+        {
+            entity.ToTable("Machines", "machinery");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()").ValueGeneratedOnAdd();
+            entity.Property(e => e.ProjectId).IsRequired();
+            entity.Property(e => e.Name).HasMaxLength(160).IsRequired();
+            entity.Property(e => e.SerialNumber).HasMaxLength(64).IsRequired();
+            entity.Property(e => e.Model).HasMaxLength(80);
+            entity.Property(e => e.Status).HasConversion<string>().IsRequired();
+            entity.Property(e => e.LastMaintenanceDate);
+            entity.Property(e => e.NextMaintenanceDate);
+            entity.Property(e => e.HourlyRate).HasPrecision(10, 2);
+            entity.Property<byte[]>("RowVersion").IsRowVersion();
+
+            entity.HasIndex(e => e.ProjectId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.SerialNumber).IsUnique();
+            entity.HasIndex(e => new { e.ProjectId, e.Status });
+            
+            // Navigation property
+            entity.HasOne(e => e.Project)
+                .WithMany()
+                .HasForeignKey(e => e.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
             entity.Ignore(e => e.DomainEvents);
         });
 
