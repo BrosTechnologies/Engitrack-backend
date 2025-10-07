@@ -61,4 +61,10 @@ public class ProjectTask : Entity
         Status = Enums.TaskStatus.PENDING;
         MarkAsUpdated();
     }
+
+    public void UpdateStatus(Enums.TaskStatus newStatus)
+    {
+        Status = newStatus;
+        MarkAsUpdated();
+    }
 }

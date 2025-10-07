@@ -17,3 +17,6 @@ D:\APP MOVIL\BACKEND\src\Projects\Engitrack.Projects.Infrastructure\obj\Debug\ne
 D:\APP MOVIL\BACKEND\src\Projects\Engitrack.Projects.Infrastructure\obj\Debug\net9.0\refint\Engitrack.Projects.Infrastructure.dll
 D:\APP MOVIL\BACKEND\src\Projects\Engitrack.Projects.Infrastructure\obj\Debug\net9.0\Engitrack.Projects.Infrastructure.pdb
 D:\APP MOVIL\BACKEND\src\Projects\Engitrack.Projects.Infrastructure\obj\Debug\net9.0\ref\Engitrack.Projects.Infrastructure.dll
+D:\APP MOVIL\BACKEND\src\Projects\Engitrack.Projects.Infrastructure\obj\Debug\net9.0\Engitrack.Projects.Infrastructure.sourcelink.json
+D:\APP MOVIL\BACKEND\src\Projects\Engitrack.Projects.Infrastructure\bin\Debug\net9.0\Engitrack.Workers.Domain.dll
+D:\APP MOVIL\BACKEND\src\Projects\Engitrack.Projects.Infrastructure\bin\Debug\net9.0\Engitrack.Workers.Domain.pdb

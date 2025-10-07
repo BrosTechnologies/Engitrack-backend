@@ -18,10 +18,6 @@ public class CreateProjectRequestValidator : AbstractValidator<CreateProjectRequ
             .When(x => x.Budget.HasValue)
             .WithMessage("Budget must be >= 0");
 
-        RuleFor(x => x.OwnerUserId)
-            .NotEmpty()
-            .WithMessage("OwnerUserId is required");
-
         RuleFor(x => x.EndDate)
             .GreaterThanOrEqualTo(x => x.StartDate)
             .When(x => x.EndDate.HasValue)

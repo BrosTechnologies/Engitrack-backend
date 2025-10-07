@@ -27,3 +27,9 @@ public record ProjectResponse(
     string Status, 
     Guid OwnerUserId, 
     IEnumerable<ProjectTaskDto> Tasks);
+
+public record CreateTaskRequest(string Title, DateOnly? DueDate);
+
+public record UpdateTaskStatusRequest(string Status);
+
+public record UpdateProjectRequest(string Name, decimal? Budget, DateOnly? EndDate);

@@ -9,3 +9,4 @@ D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net
 D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net9.0\refint\Engitrack.Machinery.Application.dll
 D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net9.0\Engitrack.Machinery.Application.pdb
 D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net9.0\ref\Engitrack.Machinery.Application.dll
+D:\APP MOVIL\BACKEND\src\Machinery\Engitrack.Machinery.Application\obj\Debug\net9.0\Engitrack.Machinery.Application.sourcelink.json

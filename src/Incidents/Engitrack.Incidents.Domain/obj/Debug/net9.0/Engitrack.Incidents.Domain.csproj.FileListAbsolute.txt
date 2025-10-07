@@ -13,3 +13,4 @@ D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Domain\obj\Debug\net9.0\E
 D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Domain\obj\Debug\net9.0\refint\Engitrack.Incidents.Domain.dll
 D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Domain\obj\Debug\net9.0\Engitrack.Incidents.Domain.pdb
 D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Domain\obj\Debug\net9.0\ref\Engitrack.Incidents.Domain.dll
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Domain\obj\Debug\net9.0\Engitrack.Incidents.Domain.sourcelink.json

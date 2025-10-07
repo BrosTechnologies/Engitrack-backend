@@ -9,3 +9,10 @@ D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Application\obj\Debug\net
 D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Application\obj\Debug\net9.0\refint\Engitrack.Inventory.Application.dll
 D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Application\obj\Debug\net9.0\Engitrack.Inventory.Application.pdb
 D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Application\obj\Debug\net9.0\ref\Engitrack.Inventory.Application.dll
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Application\obj\Debug\net9.0\Engitrack.Inventory.Application.sourcelink.json
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Application\bin\Debug\net9.0\Engitrack.BuildingBlocks.dll
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Application\bin\Debug\net9.0\Engitrack.Inventory.Domain.dll
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Application\bin\Debug\net9.0\Engitrack.Inventory.Domain.pdb
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Application\bin\Debug\net9.0\Engitrack.BuildingBlocks.pdb
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Application\obj\Debug\net9.0\Engitrack.Inventory.Application.csproj.AssemblyReference.cache
+D:\APP MOVIL\BACKEND\src\Inventory\Engitrack.Inventory.Application\obj\Debug\net9.0\Engitrac.6C7E244F.Up2Date

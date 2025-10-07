@@ -10,6 +10,7 @@
         "dependencies": {
           "Engitrack.Projects.Application": "1.0.0",
           "Engitrack.Projects.Domain": "1.0.0",
+          "Engitrack.Workers.Domain": "1.0.0",
           "Microsoft.EntityFrameworkCore.SqlServer": "9.0.9"
         },
         "runtime": {
@@ -659,6 +660,17 @@
             "fileVersion": "1.0.0.0"
           }
         }
+      },
+      "Engitrack.Workers.Domain/1.0.0": {
+        "dependencies": {
+          "Engitrack.BuildingBlocks": "1.0.0"
+        },
+        "runtime": {
+          "Engitrack.Workers.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -1064,6 +1076,11 @@
       "sha512": ""
     },
     "Engitrack.Projects.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Engitrack.Workers.Domain/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

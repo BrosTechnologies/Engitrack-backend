@@ -10,3 +10,4 @@ D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Infrastructure\obj\Debug\net9
 D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Infrastructure\obj\Debug\net9.0\Engitrack.Workers.Infrastructure.pdb
 D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Infrastructure\obj\Debug\net9.0\ref\Engitrack.Workers.Infrastructure.dll
 D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Infrastructure\obj\Debug\net9.0\Engitrack.Workers.Infrastructure.csproj.AssemblyReference.cache
+D:\APP MOVIL\BACKEND\src\Workers\Engitrack.Workers.Infrastructure\obj\Debug\net9.0\Engitrack.Workers.Infrastructure.sourcelink.json

@@ -1050,6 +1050,19 @@
         "runtime": {
           "bin/placeholder/Engitrack.Projects.Domain.dll": {}
         }
+      },
+      "Engitrack.Workers.Domain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "Engitrack.BuildingBlocks": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Engitrack.Workers.Domain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Engitrack.Workers.Domain.dll": {}
+        }
       }
     }
   },
@@ -2634,12 +2647,18 @@
       "type": "project",
       "path": "../Engitrack.Projects.Domain/Engitrack.Projects.Domain.csproj",
       "msbuildProject": "../Engitrack.Projects.Domain/Engitrack.Projects.Domain.csproj"
+    },
+    "Engitrack.Workers.Domain/1.0.0": {
+      "type": "project",
+      "path": "../../Workers/Engitrack.Workers.Domain/Engitrack.Workers.Domain.csproj",
+      "msbuildProject": "../../Workers/Engitrack.Workers.Domain/Engitrack.Workers.Domain.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net9.0": [
       "Engitrack.Projects.Application >= 1.0.0",
       "Engitrack.Projects.Domain >= 1.0.0",
+      "Engitrack.Workers.Domain >= 1.0.0",
       "Microsoft.EntityFrameworkCore.SqlServer >= 9.0.9"
     ]
   },
@@ -2673,6 +2692,9 @@
             },
             "D:\\APP MOVIL\\BACKEND\\src\\Projects\\Engitrack.Projects.Domain\\Engitrack.Projects.Domain.csproj": {
               "projectPath": "D:\\APP MOVIL\\BACKEND\\src\\Projects\\Engitrack.Projects.Domain\\Engitrack.Projects.Domain.csproj"
+            },
+            "D:\\APP MOVIL\\BACKEND\\src\\Workers\\Engitrack.Workers.Domain\\Engitrack.Workers.Domain.csproj": {
+              "projectPath": "D:\\APP MOVIL\\BACKEND\\src\\Workers\\Engitrack.Workers.Domain\\Engitrack.Workers.Domain.csproj"
             }
           }
         }
