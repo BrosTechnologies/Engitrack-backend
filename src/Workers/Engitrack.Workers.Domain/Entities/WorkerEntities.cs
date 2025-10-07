@@ -57,6 +57,9 @@ public class Assignment : Entity
     public DateOnly StartDate { get; private set; }
     public DateOnly? EndDate { get; private set; }
 
+    // Navigation properties
+    public Worker? Worker { get; private set; }
+
     private Assignment() { } // EF Constructor
 
     public Assignment(Guid workerId, Guid projectId, DateOnly startDate)
@@ -91,6 +94,9 @@ public class Attendance : Entity
     public TimeOnly? CheckOut { get; private set; }
     public AttendanceStatus Status { get; private set; }
     public string Notes { get; private set; } = string.Empty;
+
+    // Navigation properties
+    public Worker? Worker { get; private set; }
 
     private Attendance() { } // EF Constructor
 

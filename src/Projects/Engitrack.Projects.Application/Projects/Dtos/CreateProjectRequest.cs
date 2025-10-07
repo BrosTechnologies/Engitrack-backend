@@ -14,6 +14,7 @@ public record CreateProjectRequest(
 
 public record ProjectTaskDto(
     Guid TaskId, 
+    Guid ProjectId,
     string Title, 
     string Status, 
     DateOnly? DueDate);

@@ -1804,6 +1804,8 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
+          "Engitrack.BuildingBlocks": "1.0.0",
+          "Engitrack.Inventory.Domain": "1.0.0",
           "Microsoft.EntityFrameworkCore.SqlServer": "9.0.9"
         },
         "compile": {
