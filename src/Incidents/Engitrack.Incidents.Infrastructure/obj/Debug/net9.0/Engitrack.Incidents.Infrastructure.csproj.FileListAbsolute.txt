@@ -10,3 +10,4 @@ D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\
 D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\Engitrack.Incidents.Infrastructure.pdb
 D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\ref\Engitrack.Incidents.Infrastructure.dll
 D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\Engitrack.Incidents.Infrastructure.csproj.AssemblyReference.cache
+D:\APP MOVIL\BACKEND\src\Incidents\Engitrack.Incidents.Infrastructure\obj\Debug\net9.0\Engitrack.Incidents.Infrastructure.sourcelink.json

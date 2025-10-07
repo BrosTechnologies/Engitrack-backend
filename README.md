@@ -9,7 +9,8 @@ Backend completo desarrollado con .NET 9, DDD + CQRS, EF Core y Azure SQL.
 - **Azure SQL Database**
 - **MediatR** para CQRS
 - **FluentValidation** para validaciones
-- **Swagger/OpenAPI** para documentación
+- **JWT Authentication** con BCrypt para hashing
+- **Swagger/OpenAPI** con Bearer token
 - **Arquitectura DDD** con Bounded Contexts
 
 ## 📁 Estructura del Proyecto
@@ -105,23 +106,88 @@ dotnet run --project src\Api
 - **Swagger UI**: https://localhost:7XXX/ (raíz del sitio)
 - **Health Check**: https://localhost:7XXX/api/health
 
+### 6. Autenticación
+
+1. **Registrar usuario**:
+   ```bash
+   POST /auth/register
+   {
+     "email": "admin@engitrack.com",
+     "fullName": "Administrator",
+     "password": "SecurePass123!",
+     "role": "SUPERVISOR"
+   }
+   ```
+
+2. **Obtener token**:
+   ```bash
+   POST /auth/login
+   {
+     "email": "admin@engitrack.com",
+     "password": "SecurePass123!"
+   }
+   ```
+
+3. **Usar token en requests**:
+   - Agregar header: `Authorization: Bearer <token>`
+   - En Swagger: Usar el botón "Authorize" y pegar el token
+
 ## 📚 API Endpoints
 
 ### Sistema
 - `GET /api/health` - Estado del sistema
 
-### Proyectos
-- `GET /api/projects` - Listar todos los proyectos
+### Autenticación
+- `POST /auth/register` - Registro de nuevo usuario
+- `POST /auth/login` - Login y obtención de JWT token
+
+### Proyectos (Requieren autenticación JWT)
+- `GET /api/projects` - Listar proyectos del usuario (con filtros y paginación)
+- `GET /api/projects/{id}` - Obtener proyecto específico
 - `POST /api/projects` - Crear nuevo proyecto
+- `POST /api/projects/{id}/tasks` - Crear nueva tarea en proyecto
+- `PATCH /api/projects/{id}/tasks/{taskId}/status` - Actualizar estado de tarea
+- `DELETE /api/projects/{id}/tasks/{taskId}` - Eliminar tarea
+- `PATCH /api/projects/{id}/complete` - Completar proyecto
+- `PATCH /api/projects/{id}` - Actualizar información del proyecto
 
-### Ejemplo de Payload para Crear Proyecto
+### Ejemplo de Payloads
 
+#### Registro de Usuario
+```json
+{
+  "email": "admin@engitrack.com",
+  "fullName": "Administrator",
+  "password": "SecurePass123!",
+  "role": "SUPERVISOR"
+}
+```
+
+#### Login
+```json
+{
+  "email": "admin@engitrack.com",
+  "password": "SecurePass123!"
+}
+```
+
+#### Crear Proyecto
 ```json
 {
   "name": "Construcción Edificio A",
-  "startDate": "2025-01-15T00:00:00",
-  "ownerUserId": "00000000-0000-0000-0000-000000000000",
-  "budget": 150000.00
+  "startDate": "2025-01-15",
+  "endDate": "2025-12-15",
+  "budget": 150000.00,
+  "tasks": [
+    {
+      "title": "Preparación del terreno",
+      "dueDate": "2025-02-01"
+    },
+    {
+      "title": "Cimentación",
+      "dueDate": "2025-03-15"
+    }
+  ]
 }
 ```
 

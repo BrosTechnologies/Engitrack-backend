@@ -43,6 +43,16 @@ public class Project : AggregateRoot
         MarkAsUpdated();
     }
 
+    public void UpdateDetails(string name, decimal? budget)
+    {
+        if (string.IsNullOrWhiteSpace(name) || name.Length > 160)
+            throw new ArgumentException("Name is required and must be <= 160 characters", nameof(name));
+
+        Name = name;
+        Budget = budget;
+        MarkAsUpdated();
+    }
+
     public void SetEndDate(DateOnly? endDate)
     {
         if (endDate.HasValue && endDate < StartDate)

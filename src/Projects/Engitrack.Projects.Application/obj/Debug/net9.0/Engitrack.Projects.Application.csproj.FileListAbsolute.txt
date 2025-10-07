@@ -15,3 +15,4 @@ D:\APP MOVIL\BACKEND\src\Projects\Engitrack.Projects.Application\obj\Debug\net9.
 D:\APP MOVIL\BACKEND\src\Projects\Engitrack.Projects.Application\obj\Debug\net9.0\refint\Engitrack.Projects.Application.dll
 D:\APP MOVIL\BACKEND\src\Projects\Engitrack.Projects.Application\obj\Debug\net9.0\Engitrack.Projects.Application.pdb
 D:\APP MOVIL\BACKEND\src\Projects\Engitrack.Projects.Application\obj\Debug\net9.0\ref\Engitrack.Projects.Application.dll
+D:\APP MOVIL\BACKEND\src\Projects\Engitrack.Projects.Application\obj\Debug\net9.0\Engitrack.Projects.Application.sourcelink.json

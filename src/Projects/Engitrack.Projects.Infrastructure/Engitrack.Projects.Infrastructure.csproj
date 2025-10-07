@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Engitrack.Projects.Domain\Engitrack.Projects.Domain.csproj" />
     <ProjectReference Include="..\Engitrack.Projects.Application\Engitrack.Projects.Application.csproj" />
+    <ProjectReference Include="..\..\Workers\Engitrack.Workers.Domain\Engitrack.Workers.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

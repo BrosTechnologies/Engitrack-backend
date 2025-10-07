@@ -7,17 +7,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.9" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Projects\Engitrack.Projects.Infrastructure\Engitrack.Projects.Infrastructure.csproj" />
     <ProjectReference Include="..\Projects\Engitrack.Projects.Application\Engitrack.Projects.Application.csproj" />
+    <ProjectReference Include="..\Inventory\Engitrack.Inventory.Infrastructure\Engitrack.Inventory.Infrastructure.csproj" />
+    <ProjectReference Include="..\Inventory\Engitrack.Inventory.Application\Engitrack.Inventory.Application.csproj" />
+    <ProjectReference Include="..\Workers\Engitrack.Workers.Infrastructure\Engitrack.Workers.Infrastructure.csproj" />
+    <ProjectReference Include="..\Workers\Engitrack.Workers.Application\Engitrack.Workers.Application.csproj" />
+    <ProjectReference Include="..\Incidents\Engitrack.Incidents.Infrastructure\Engitrack.Incidents.Infrastructure.csproj" />
+    <ProjectReference Include="..\Incidents\Engitrack.Incidents.Application\Engitrack.Incidents.Application.csproj" />
+    <ProjectReference Include="..\Machinery\Engitrack.Machinery.Infrastructure\Engitrack.Machinery.Infrastructure.csproj" />
+    <ProjectReference Include="..\Machinery\Engitrack.Machinery.Application\Engitrack.Machinery.Application.csproj" />
   </ItemGroup>
 
 </Project>

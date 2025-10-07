@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Engitrack.BuildingBlocks")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1a4b16fa7084066c675cf0ddd2b173699a17a3a3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+179822b4becbe19033737c6ea4ddc18c6a028d95")]
 [assembly: System.Reflection.AssemblyProductAttribute("Engitrack.BuildingBlocks")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Engitrack.BuildingBlocks")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

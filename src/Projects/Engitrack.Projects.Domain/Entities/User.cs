@@ -9,10 +9,11 @@ public class User : Entity
     public string FullName { get; private set; } = string.Empty;
     public string Phone { get; private set; } = string.Empty;
     public Role Role { get; private set; }
+    public string PasswordHash { get; private set; } = string.Empty;
 
     private User() { } // EF Constructor
 
-    public User(string email, string fullName, string phone, Role role)
+    public User(string email, string fullName, string phone, Role role, string passwordHash = "")
     {
         if (string.IsNullOrWhiteSpace(email) || email.Length > 256)
             throw new ArgumentException("Email is required and must be <= 256 characters", nameof(email));
@@ -27,6 +28,7 @@ public class User : Entity
         FullName = fullName;
         Phone = phone;
         Role = role;
+        PasswordHash = passwordHash;
     }
 
     public void UpdateProfile(string fullName, string phone)
@@ -39,6 +41,12 @@ public class User : Entity
 
         FullName = fullName;
         Phone = phone;
+        MarkAsUpdated();
+    }
+
+    public void SetPassword(string passwordHash)
+    {
+        PasswordHash = passwordHash;
         MarkAsUpdated();
     }
 

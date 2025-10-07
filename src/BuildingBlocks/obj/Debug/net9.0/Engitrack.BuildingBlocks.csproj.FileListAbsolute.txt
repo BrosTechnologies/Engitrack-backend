@@ -10,3 +10,4 @@ D:\APP MOVIL\BACKEND\src\BuildingBlocks\obj\Debug\net9.0\Engitrack.BuildingBlock
 D:\APP MOVIL\BACKEND\src\BuildingBlocks\obj\Debug\net9.0\refint\Engitrack.BuildingBlocks.dll
 D:\APP MOVIL\BACKEND\src\BuildingBlocks\obj\Debug\net9.0\Engitrack.BuildingBlocks.pdb
 D:\APP MOVIL\BACKEND\src\BuildingBlocks\obj\Debug\net9.0\ref\Engitrack.BuildingBlocks.dll
+D:\APP MOVIL\BACKEND\src\BuildingBlocks\obj\Debug\net9.0\Engitrack.BuildingBlocks.sourcelink.json
