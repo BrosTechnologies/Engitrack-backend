@@ -151,7 +151,13 @@ app.MapGet("/api/projects", async (ProjectsDbContext context, ICurrentUser curre
     var query = context.Projects
         .AsNoTracking()
         .Include(p => p.Tasks)
-        .Where(p => p.OwnerUserId == currentUser.Id);
+        .AsQueryable();
+
+    // SUPERVISOR and CONTRACTOR can see all projects, others only see their own projects
+    if (currentUser.Role != "SUPERVISOR" && currentUser.Role != "CONTRACTOR")
+    {
+        query = query.Where(p => p.OwnerUserId == currentUser.Id);
+    }
 
     // Apply filters
     if (!string.IsNullOrEmpty(status))
@@ -197,7 +203,8 @@ app.MapGet("/api/projects/{id:guid}", async (Guid id, ProjectsDbContext context,
     if (project == null)
         return Results.NotFound();
 
-    if (project.OwnerUserId != currentUser.Id)
+    // SUPERVISOR and CONTRACTOR can access any project, others only their own projects
+    if (currentUser.Role != "SUPERVISOR" && currentUser.Role != "CONTRACTOR" && project.OwnerUserId != currentUser.Id)
         return Results.Forbid();
 
     var response = new ProjectResponse(
@@ -297,7 +304,8 @@ app.MapPost("/api/projects/{id:guid}/tasks", async (Guid id, CreateTaskRequest r
     if (project == null)
         return Results.NotFound();
 
-    if (project.OwnerUserId != currentUser.Id)
+    // SUPERVISOR and CONTRACTOR can manage any project, others only their own projects
+    if (currentUser.Role != "SUPERVISOR" && currentUser.Role != "CONTRACTOR" && project.OwnerUserId != currentUser.Id)
         return Results.Forbid();
 
     // Create task directly without loading the project into context
@@ -340,7 +348,8 @@ app.MapPatch("/api/projects/{id:guid}/tasks/{taskId:guid}/status", async (Guid i
     if (project == null)
         return Results.NotFound("Project not found");
 
-    if (project.OwnerUserId != currentUser.Id)
+    // SUPERVISOR and CONTRACTOR can manage any project, others only their own projects
+    if (currentUser.Role != "SUPERVISOR" && currentUser.Role != "CONTRACTOR" && project.OwnerUserId != currentUser.Id)
         return Results.Forbid();
 
     var task = project.Tasks.FirstOrDefault(t => t.Id == taskId);
@@ -380,7 +389,8 @@ app.MapDelete("/api/projects/{id:guid}/tasks/{taskId:guid}", async (Guid id, Gui
     if (project == null)
         return Results.NotFound("Project not found");
 
-    if (project.OwnerUserId != currentUser.Id)
+    // SUPERVISOR can manage any project, others only their own projects
+    if (currentUser.Role != "SUPERVISOR" && project.OwnerUserId != currentUser.Id)
         return Results.Forbid();
 
     var task = project.Tasks.FirstOrDefault(t => t.Id == taskId);
@@ -411,7 +421,8 @@ app.MapPatch("/api/projects/{id:guid}/complete", async (Guid id, ProjectsDbConte
     if (project == null)
         return Results.NotFound();
 
-    if (project.OwnerUserId != currentUser.Id)
+    // SUPERVISOR and CONTRACTOR can manage any project, others only their own projects
+    if (currentUser.Role != "SUPERVISOR" && currentUser.Role != "CONTRACTOR" && project.OwnerUserId != currentUser.Id)
         return Results.Forbid();
 
     try
@@ -461,7 +472,8 @@ app.MapPatch("/api/projects/{id:guid}", async (Guid id, UpdateProjectRequest req
     if (project == null)
         return Results.NotFound();
 
-    if (project.OwnerUserId != currentUser.Id)
+    // SUPERVISOR and CONTRACTOR can manage any project, others only their own projects
+    if (currentUser.Role != "SUPERVISOR" && currentUser.Role != "CONTRACTOR" && project.OwnerUserId != currentUser.Id)
         return Results.Forbid();
 
     // Validate EndDate >= StartDate
