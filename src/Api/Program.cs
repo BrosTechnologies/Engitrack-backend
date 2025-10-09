@@ -122,15 +122,13 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Enable Swagger in both Development and Production for API testing
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Engitrack API v1");
-        c.RoutePrefix = string.Empty; // Swagger en la raíz
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Engitrack API v1");
+    c.RoutePrefix = string.Empty; // Swagger en la raíz
+});
 
 app.UseCors();
 app.UseHttpsRedirection();
@@ -138,6 +136,16 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Basic endpoints
+app.MapGet("/", () => Results.Ok(new { 
+    Message = "Engitrack API is running!", 
+    Version = "v1",
+    Timestamp = DateTime.UtcNow,
+    SwaggerUI = "/swagger",
+    HealthCheck = "/api/health"
+}))
+   .WithName("Root")
+   .WithTags("System");
+
 app.MapGet("/api/health", () => Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow }))
    .WithName("HealthCheck")
    .WithTags("System");
