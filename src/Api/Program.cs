@@ -150,6 +150,19 @@ app.MapGet("/api/health", () => Results.Ok(new { Status = "Healthy", Timestamp =
    .WithName("HealthCheck")
    .WithTags("System");
 
+// Debug endpoint to check configuration
+app.MapGet("/api/debug/config", (IConfiguration config) => Results.Ok(new {
+    Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
+    HasConnectionString = !string.IsNullOrEmpty(config.GetConnectionString("SqlServer")),
+    ConnectionStringLength = config.GetConnectionString("SqlServer")?.Length ?? 0,
+    HasJwtKey = !string.IsNullOrEmpty(config["Jwt:Key"]),
+    JwtKeyLength = config["Jwt:Key"]?.Length ?? 0,
+    JwtIssuer = config["Jwt:Issuer"],
+    JwtAudience = config["Jwt:Audience"]
+}))
+   .WithName("DebugConfig")
+   .WithTags("System");
+
 // Projects endpoints (authenticated)
 app.MapGet("/api/projects", async (ProjectsDbContext context, ICurrentUser currentUser, string? status = null, string? q = null, int page = 1, int pageSize = 10) =>
 {
