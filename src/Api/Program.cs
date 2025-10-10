@@ -150,6 +150,59 @@ app.MapGet("/api/health", () => Results.Ok(new { Status = "Healthy", Timestamp =
    .WithName("HealthCheck")
    .WithTags("System");
 
+// Debug endpoint to check configuration
+app.MapGet("/api/debug/config", (IConfiguration config) => Results.Ok(new {
+    Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
+    HasConnectionString = !string.IsNullOrEmpty(config.GetConnectionString("SqlServer")),
+    ConnectionStringLength = config.GetConnectionString("SqlServer")?.Length ?? 0,
+    HasJwtKey = !string.IsNullOrEmpty(config["Jwt:Key"]),
+    JwtKeyLength = config["Jwt:Key"]?.Length ?? 0,
+    JwtIssuer = config["Jwt:Issuer"],
+    JwtAudience = config["Jwt:Audience"]
+}))
+   .WithName("DebugConfig")
+   .WithTags("System");
+
+// Debug endpoint to check database connectivity
+app.MapGet("/api/debug/database", async (ProjectsDbContext context) => {
+    try
+    {
+        // Test basic connectivity
+        var canConnect = await context.Database.CanConnectAsync();
+        
+        // Check if Users table exists
+        var usersTableExists = false;
+        var userCount = 0;
+        
+        try
+        {
+            userCount = await context.Users.CountAsync();
+            usersTableExists = true;
+        }
+        catch (Exception ex)
+        {
+            // Table doesn't exist or other error
+        }
+        
+        return Results.Ok(new {
+            CanConnect = canConnect,
+            UsersTableExists = usersTableExists,
+            UserCount = userCount,
+            DatabaseName = context.Database.GetDbConnection().Database
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.Ok(new {
+            Error = ex.Message,
+            CanConnect = false,
+            UsersTableExists = false
+        });
+    }
+})
+   .WithName("DebugDatabase")
+   .WithTags("System");
+
 // Projects endpoints (authenticated)
 app.MapGet("/api/projects", async (ProjectsDbContext context, ICurrentUser currentUser, string? status = null, string? q = null, int page = 1, int pageSize = 10) =>
 {
@@ -1350,26 +1403,33 @@ app.MapPost("/api/attendances", async (CreateAttendanceRequest request, IValidat
 // Auth endpoints
 app.MapPost("/auth/register", async (RegisterRequest request, ProjectsDbContext context, JwtHelper jwtHelper) =>
 {
-    // Check if user already exists
-    if (await context.Users.AnyAsync(u => u.Email == request.Email))
-        return Results.BadRequest(new { error = "User with this email already exists" });
+    try
+    {
+        // Check if user already exists
+        if (await context.Users.AnyAsync(u => u.Email == request.Email))
+            return Results.BadRequest(new { error = "User with this email already exists" });
 
-    // Validate role
-    if (!Enum.TryParse<Role>(request.Role, true, out var role))
-        return Results.BadRequest(new { error = "Invalid role" });
+        // Validate role
+        if (!Enum.TryParse<Role>(request.Role, true, out var role))
+            return Results.BadRequest(new { error = "Invalid role" });
 
-    // Hash password
-    var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        // Hash password
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
-    // Create user
-    var user = new User(request.Email, request.FullName, request.Phone ?? "000-000-0000", role, passwordHash);
-    context.Users.Add(user);
-    await context.SaveChangesAsync();
+        // Create user
+        var user = new User(request.Email, request.FullName, request.Phone ?? "000-000-0000", role, passwordHash);
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
 
-    // Generate token
-    var token = jwtHelper.GenerateToken(user.Id, user.Email, user.Role.ToString());
+        // Generate token
+        var token = jwtHelper.GenerateToken(user.Id, user.Email, user.Role.ToString());
 
-    return Results.Ok(new AuthResponse(user.Id, user.Email, user.Role.ToString(), token));
+        return Results.Ok(new AuthResponse(user.Id, user.Email, user.Role.ToString(), token));
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Registration error: {ex.Message}");
+    }
 })
 .WithName("Register")
 .WithTags("Auth")
@@ -1379,19 +1439,26 @@ app.MapPost("/auth/register", async (RegisterRequest request, ProjectsDbContext 
 
 app.MapPost("/auth/login", async (LoginRequest request, ProjectsDbContext context, JwtHelper jwtHelper) =>
 {
-    // Find user
-    var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-    if (user == null)
-        return Results.Unauthorized();
+    try
+    {
+        // Find user
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (user == null)
+            return Results.Unauthorized();
 
-    // Verify password
-    if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-        return Results.Unauthorized();
+        // Verify password
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+            return Results.Unauthorized();
 
-    // Generate token
-    var token = jwtHelper.GenerateToken(user.Id, user.Email, user.Role.ToString());
+        // Generate token
+        var token = jwtHelper.GenerateToken(user.Id, user.Email, user.Role.ToString());
 
-    return Results.Ok(new AuthResponse(user.Id, user.Email, user.Role.ToString(), token));
+        return Results.Ok(new AuthResponse(user.Id, user.Email, user.Role.ToString(), token));
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Login error: {ex.Message}");
+    }
 })
 .WithName("Login")
 .WithTags("Auth")
