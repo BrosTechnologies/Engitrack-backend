@@ -11,6 +11,7 @@ using Engitrack.Workers.Application.Validators;
 using Engitrack.Api.Security;
 using Engitrack.Api.Auth;
 using Engitrack.Api.Contracts.Projects;
+using Engitrack.Api.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -74,6 +75,7 @@ builder.Services.AddScoped<IValidator<UpdateMaterialRequest>, UpdateMaterialRequ
 builder.Services.AddScoped<IValidator<RegisterTransactionRequest>, RegisterTransactionRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateSupplierRequest>, CreateSupplierRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateSupplierRequest>, UpdateSupplierRequestValidator>();
+builder.Services.AddScoped<IValidator<UpdateUserProfileRequest>, UpdateUserProfileRequestValidator>();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -1465,6 +1467,137 @@ app.MapPost("/auth/login", async (LoginRequest request, ProjectsDbContext contex
 .Accepts<LoginRequest>("application/json")
 .Produces<AuthResponse>(200)
 .Produces(401);
+
+// User profile endpoints
+app.MapGet("/api/users/profile", async (ProjectsDbContext context, ClaimsPrincipal user) =>
+{
+    var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+    
+    var userProfile = await context.Users
+        .AsNoTracking()
+        .FirstOrDefaultAsync(u => u.Id == userId);
+    
+    if (userProfile == null)
+        return Results.NotFound("User not found");
+    
+    var profileResponse = new UserProfileResponse(
+        userProfile.Id,
+        userProfile.Email,
+        userProfile.FullName,
+        userProfile.Phone,
+        userProfile.Role.ToString()
+    );
+    
+    return Results.Ok(profileResponse);
+})
+.RequireAuthorization()
+.WithName("GetUserProfile")
+.WithTags("Users")
+.Produces<UserProfileResponse>(200)
+.Produces(404);
+
+app.MapGet("/api/users/{id:guid}", async (Guid id, ProjectsDbContext context, ClaimsPrincipal user) =>
+{
+    var currentUserId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+    var currentUserRole = user.FindFirst(ClaimTypes.Role)!.Value;
+    
+    // Only SUPERVISOR and CONTRACTOR can see other users, or users can see themselves
+    if (currentUserRole != "SUPERVISOR" && currentUserRole != "CONTRACTOR" && currentUserId != id)
+        return Results.Forbid();
+    
+    var targetUser = await context.Users
+        .AsNoTracking()
+        .FirstOrDefaultAsync(u => u.Id == id);
+    
+    if (targetUser == null)
+        return Results.NotFound("User not found");
+    
+    var userResponse = new UserProfileResponse(
+        targetUser.Id,
+        targetUser.Email,
+        targetUser.FullName,
+        targetUser.Phone,
+        targetUser.Role.ToString()
+    );
+    
+    return Results.Ok(userResponse);
+})
+.RequireAuthorization()
+.WithName("GetUserById")
+.WithTags("Users")
+.Produces<UserProfileResponse>(200)
+.Produces(404)
+.Produces(403);
+
+app.MapGet("/api/users", async (ProjectsDbContext context, ClaimsPrincipal user, int page = 1, int pageSize = 20) =>
+{
+    var currentUserRole = user.FindFirst(ClaimTypes.Role)!.Value;
+    
+    // Only SUPERVISOR and CONTRACTOR can list all users
+    if (currentUserRole != "SUPERVISOR" && currentUserRole != "CONTRACTOR")
+        return Results.Forbid();
+    
+    var users = await context.Users
+        .AsNoTracking()
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .Select(u => new UserProfileResponse(
+            u.Id,
+            u.Email,
+            u.FullName,
+            u.Phone,
+            u.Role.ToString()
+        ))
+        .ToListAsync();
+    
+    return Results.Ok(users);
+})
+.RequireAuthorization()
+.WithName("GetUsers")
+.WithTags("Users")
+.Produces<List<UserProfileResponse>>(200)
+.Produces(403);
+
+app.MapPatch("/api/users/profile", async (UpdateUserProfileRequest request, ProjectsDbContext context, ClaimsPrincipal user, IValidator<UpdateUserProfileRequest> validator) =>
+{
+    var validationResult = await validator.ValidateAsync(request);
+    if (!validationResult.IsValid)
+        return Results.BadRequest(validationResult.Errors.Select(e => new { Property = e.PropertyName, Error = e.ErrorMessage }));
+
+    var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+    
+    var userProfile = await context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+    if (userProfile == null)
+        return Results.NotFound("User not found");
+    
+    try
+    {
+        // Update profile information
+        userProfile.UpdateProfile(request.FullName, request.Phone);
+        await context.SaveChangesAsync();
+        
+        var profileResponse = new UserProfileResponse(
+            userProfile.Id,
+            userProfile.Email,
+            userProfile.FullName,
+            userProfile.Phone,
+            userProfile.Role.ToString()
+        );
+        
+        return Results.Ok(profileResponse);
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+})
+.RequireAuthorization()
+.WithName("UpdateUserProfile")
+.WithTags("Users")
+.Accepts<UpdateUserProfileRequest>("application/json")
+.Produces<UserProfileResponse>(200)
+.Produces(400)
+.Produces(404);
 
 // ===== INCIDENTS ENDPOINTS =====
 
