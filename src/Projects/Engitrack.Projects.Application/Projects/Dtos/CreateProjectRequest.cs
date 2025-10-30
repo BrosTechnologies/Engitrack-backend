@@ -38,3 +38,5 @@ public record UpdateTaskStatusRequest(string Status);
 public record UpdateProjectRequest(string Name, decimal? Budget, DateOnly? EndDate, Priority? Priority);
 
 public record UpdatePriorityRequest(Priority Priority);
+
+public record UpdatePriorityStringRequest(string Priority);
