@@ -61,6 +61,7 @@ builder.Services.AddScoped<IValidator<CreateProjectRequest>, CreateProjectReques
 builder.Services.AddScoped<IValidator<CreateTaskRequest>, CreateTaskRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateTaskStatusRequest>, UpdateTaskStatusRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateProjectRequest>, UpdateProjectRequestValidator>();
+builder.Services.AddScoped<IValidator<UpdatePriorityRequest>, UpdatePriorityRequestValidator>();
 builder.Services.AddScoped<IValidator<RegisterTransactionRequest>, RegisterTransactionRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateWorkerRequest>, CreateWorkerRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateWorkerRequest>, UpdateWorkerRequestValidator>();
@@ -242,6 +243,7 @@ app.MapGet("/api/projects", async (ProjectsDbContext context, ICurrentUser curre
         p.EndDate,
         p.Budget,
         p.Status.ToString(),
+        p.Priority.ToString(),
         p.OwnerUserId,
         p.Tasks.Select(t => new ProjectTaskDto(t.Id, p.Id, t.Title, t.Status.ToString(), t.DueDate))
     ));
@@ -277,6 +279,7 @@ app.MapGet("/api/projects/{id:guid}", async (Guid id, ProjectsDbContext context,
         project.EndDate,
         project.Budget,
         project.Status.ToString(),
+        project.Priority.ToString(),
         project.OwnerUserId,
         project.Tasks.Select(t => new ProjectTaskDto(t.Id, project.Id, t.Title, t.Status.ToString(), t.DueDate))
     );
@@ -309,7 +312,7 @@ app.MapPost("/api/projects", async (CreateProjectRequest request, IValidator<Cre
     var owner = currentUser.Id!.Value;
 
     // Create project
-    var project = new Project(request.Name, request.StartDate, owner, request.Budget);
+    var project = new Project(request.Name, request.StartDate, owner, request.Budget, request.Priority ?? Priority.MEDIUM);
 
     // Set EndDate if provided and valid
     if (request.EndDate.HasValue && request.EndDate >= request.StartDate)
@@ -337,6 +340,7 @@ app.MapPost("/api/projects", async (CreateProjectRequest request, IValidator<Cre
         project.EndDate,
         project.Budget,
         project.Status.ToString(),
+        project.Priority.ToString(),
         project.OwnerUserId,
         project.Tasks.Select(t => new ProjectTaskDto(t.Id, project.Id, t.Title, t.Status.ToString(), t.DueDate))
     );
@@ -500,6 +504,7 @@ app.MapPatch("/api/projects/{id:guid}/complete", async (Guid id, ProjectsDbConte
             project.EndDate,
             project.Budget,
             project.Status.ToString(),
+            project.Priority.ToString(),
             project.OwnerUserId,
             project.Tasks.Select(t => new ProjectTaskDto(t.Id, project.Id, t.Title, t.Status.ToString(), t.DueDate))
         );
@@ -544,7 +549,7 @@ app.MapPatch("/api/projects/{id:guid}", async (Guid id, UpdateProjectRequest req
         return Results.BadRequest(new { error = "EndDate must be >= StartDate" });
 
     // Update project
-    project.UpdateDetails(request.Name, request.Budget);
+    project.UpdateDetails(request.Name, request.Budget, request.Priority);
     if (request.EndDate.HasValue)
         project.SetEndDate(request.EndDate);
 
@@ -557,6 +562,7 @@ app.MapPatch("/api/projects/{id:guid}", async (Guid id, UpdateProjectRequest req
         project.EndDate,
         project.Budget,
         project.Status.ToString(),
+        project.Priority.ToString(),
         project.OwnerUserId,
         project.Tasks.Select(t => new ProjectTaskDto(t.Id, project.Id, t.Title, t.Status.ToString(), t.DueDate))
     );
@@ -569,6 +575,49 @@ app.MapPatch("/api/projects/{id:guid}", async (Guid id, UpdateProjectRequest req
 .Accepts<UpdateProjectRequest>("application/json")
 .Produces<ProjectResponse>(200)
 .Produces(400)
+.Produces(404)
+.Produces(403);
+
+// PATCH /api/projects/{id}/priority - Update project priority specifically
+app.MapPatch("/api/projects/{id:guid}/priority", async (Guid id, UpdatePriorityRequest request, ProjectsDbContext context, ICurrentUser currentUser) =>
+{
+    if (!currentUser.IsAuthenticated)
+        return Results.Unauthorized();
+
+    var project = await context.Projects
+        .Include(p => p.Tasks)
+        .FirstOrDefaultAsync(p => p.Id == id);
+
+    if (project == null)
+        return Results.NotFound();
+
+    // SUPERVISOR and CONTRACTOR can manage any project, others only their own projects
+    if (currentUser.Role != "SUPERVISOR" && currentUser.Role != "CONTRACTOR" && project.OwnerUserId != currentUser.Id)
+        return Results.Forbid();
+
+    // Update priority
+    project.SetPriority(request.Priority);
+    await context.SaveChangesAsync();
+
+    var response = new ProjectResponse(
+        project.Id,
+        project.Name,
+        project.StartDate,
+        project.EndDate,
+        project.Budget,
+        project.Status.ToString(),
+        project.Priority.ToString(),
+        project.OwnerUserId,
+        project.Tasks.Select(t => new ProjectTaskDto(t.Id, project.Id, t.Title, t.Status.ToString(), t.DueDate))
+    );
+
+    return Results.Ok(response);
+})
+.RequireAuthorization()
+.WithName("UpdateProjectPriority")
+.WithTags("Projects")
+.Accepts<UpdatePriorityRequest>("application/json")
+.Produces<ProjectResponse>(200)
 .Produces(404)
 .Produces(403);
 

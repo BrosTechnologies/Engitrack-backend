@@ -20,3 +20,10 @@ public enum TaskStatus
     IN_PROGRESS,
     DONE
 }
+
+public enum Priority
+{
+    LOW,    // Baja
+    MEDIUM, // Media
+    HIGH    // Alta
+}

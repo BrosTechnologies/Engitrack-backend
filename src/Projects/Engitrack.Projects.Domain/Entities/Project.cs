@@ -10,6 +10,7 @@ public class Project : AggregateRoot
     public DateOnly? EndDate { get; private set; }
     public decimal? Budget { get; private set; }
     public ProjectStatus Status { get; private set; }
+    public Priority Priority { get; private set; }
     public Guid OwnerUserId { get; private set; }
 
     private readonly List<ProjectTask> _tasks = new();
@@ -17,7 +18,7 @@ public class Project : AggregateRoot
 
     private Project() { } // EF Constructor
 
-    public Project(string name, DateOnly startDate, Guid ownerUserId, decimal? budget = null)
+    public Project(string name, DateOnly startDate, Guid ownerUserId, decimal? budget = null, Priority priority = Priority.MEDIUM)
     {
         if (string.IsNullOrWhiteSpace(name) || name.Length > 160)
             throw new ArgumentException("Name is required and must be <= 160 characters", nameof(name));
@@ -29,10 +30,11 @@ public class Project : AggregateRoot
         StartDate = startDate;
         Budget = budget;
         Status = ProjectStatus.ACTIVE;
+        Priority = priority;
         OwnerUserId = ownerUserId;
     }
 
-    public void UpdateBasicInfo(string name, DateOnly? endDate, decimal? budget)
+    public void UpdateBasicInfo(string name, DateOnly? endDate, decimal? budget, Priority? priority = null)
     {
         if (string.IsNullOrWhiteSpace(name) || name.Length > 160)
             throw new ArgumentException("Name is required and must be <= 160 characters", nameof(name));
@@ -40,16 +42,24 @@ public class Project : AggregateRoot
         Name = name;
         EndDate = endDate;
         Budget = budget;
+        
+        if (priority.HasValue)
+            Priority = priority.Value;
+            
         MarkAsUpdated();
     }
 
-    public void UpdateDetails(string name, decimal? budget)
+    public void UpdateDetails(string name, decimal? budget, Priority? priority = null)
     {
         if (string.IsNullOrWhiteSpace(name) || name.Length > 160)
             throw new ArgumentException("Name is required and must be <= 160 characters", nameof(name));
 
         Name = name;
         Budget = budget;
+        
+        if (priority.HasValue)
+            Priority = priority.Value;
+            
         MarkAsUpdated();
     }
 
@@ -59,6 +69,12 @@ public class Project : AggregateRoot
             throw new ArgumentException("EndDate cannot be before StartDate", nameof(endDate));
 
         EndDate = endDate;
+        MarkAsUpdated();
+    }
+
+    public void SetPriority(Priority priority)
+    {
+        Priority = priority;
         MarkAsUpdated();
     }
 

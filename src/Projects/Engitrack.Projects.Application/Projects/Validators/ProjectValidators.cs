@@ -1,5 +1,6 @@
 using FluentValidation;
 using Engitrack.Projects.Application.Projects.Dtos;
+using Engitrack.Projects.Domain.Enums;
 
 namespace Engitrack.Projects.Application.Projects.Validators;
 
@@ -45,5 +46,20 @@ public class UpdateProjectRequestValidator : AbstractValidator<UpdateProjectRequ
         RuleFor(x => x.Budget)
             .GreaterThanOrEqualTo(0)
             .When(x => x.Budget.HasValue);
+
+        RuleFor(x => x.Priority)
+            .IsInEnum()
+            .When(x => x.Priority.HasValue)
+            .WithMessage("Priority must be a valid value (LOW, MEDIUM, HIGH)");
+    }
+}
+
+public class UpdatePriorityRequestValidator : AbstractValidator<UpdatePriorityRequest>
+{
+    public UpdatePriorityRequestValidator()
+    {
+        RuleFor(x => x.Priority)
+            .IsInEnum()
+            .WithMessage("Priority must be a valid value (LOW, MEDIUM, HIGH)");
     }
 }
