@@ -1,5 +1,7 @@
 using FluentValidation;
 using Engitrack.Projects.Application.Projects.Dtos;
+using Engitrack.Projects.Domain.Enums;
+using System;
 
 namespace Engitrack.Projects.Application.Projects.Validators;
 
@@ -22,6 +24,10 @@ public class CreateProjectRequestValidator : AbstractValidator<CreateProjectRequ
             .GreaterThanOrEqualTo(x => x.StartDate)
             .When(x => x.EndDate.HasValue)
             .WithMessage("EndDate must be >= StartDate");
+
+        RuleFor(x => x.Priority)
+            .Must(priority => priority == null || Enum.IsDefined(typeof(Priority), priority.Value))
+            .WithMessage("Priority must be a valid value: 0 (LOW), 1 (MEDIUM), or 2 (HIGH)");
 
         RuleForEach(x => x.Tasks)
             .ChildRules(task =>

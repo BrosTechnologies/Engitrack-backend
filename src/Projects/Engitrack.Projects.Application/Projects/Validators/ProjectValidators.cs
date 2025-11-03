@@ -1,5 +1,7 @@
 using FluentValidation;
 using Engitrack.Projects.Application.Projects.Dtos;
+using Engitrack.Projects.Domain.Enums;
+using System;
 
 namespace Engitrack.Projects.Application.Projects.Validators;
 
@@ -45,5 +47,30 @@ public class UpdateProjectRequestValidator : AbstractValidator<UpdateProjectRequ
         RuleFor(x => x.Budget)
             .GreaterThanOrEqualTo(0)
             .When(x => x.Budget.HasValue);
+
+        RuleFor(x => x.Priority)
+            .Must(priority => priority == null || Enum.IsDefined(typeof(Priority), priority.Value))
+            .WithMessage("Priority must be a valid value: 0 (LOW), 1 (MEDIUM), or 2 (HIGH)");
+    }
+}
+
+public class UpdatePriorityRequestValidator : AbstractValidator<UpdatePriorityRequest>
+{
+    public UpdatePriorityRequestValidator()
+    {
+        RuleFor(x => x.Priority)
+            .Must(priority => Enum.IsDefined(typeof(Priority), priority))
+            .WithMessage("Priority must be a valid value: 0 (LOW), 1 (MEDIUM), or 2 (HIGH)");
+    }
+}
+
+public class UpdatePriorityStringRequestValidator : AbstractValidator<UpdatePriorityStringRequest>
+{
+    public UpdatePriorityStringRequestValidator()
+    {
+        RuleFor(x => x.Priority)
+            .NotEmpty()
+            .Must(priority => priority.ToUpper() is "LOW" or "MEDIUM" or "HIGH")
+            .WithMessage("Priority must be: LOW, MEDIUM, or HIGH");
     }
 }
