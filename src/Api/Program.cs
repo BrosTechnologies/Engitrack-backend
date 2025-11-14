@@ -1639,6 +1639,43 @@ app.MapGet("/api/users/profile", async (ProjectsDbContext context, ClaimsPrincip
 .Produces<UserProfileResponse>(200)
 .Produces(404);
 
+app.MapGet("/api/users/profile/stats", async (
+    ProjectsDbContext context, 
+    ClaimsPrincipal user,
+    CancellationToken cancellationToken) =>
+{
+    var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+    
+    // Count projects owned by the user
+    var projectsCount = await context.Projects
+        .AsNoTracking()
+        .Where(p => p.OwnerUserId == userId)
+        .CountAsync(cancellationToken);
+    
+    // Count all tasks in projects owned by the user
+    var tasksCount = await context.ProjectTasks
+        .AsNoTracking()
+        .Where(t => context.Projects.Any(p => p.Id == t.ProjectId && p.OwnerUserId == userId))
+        .CountAsync(cancellationToken);
+    
+    // Count completed tasks (DONE status) in projects owned by the user
+    var completedTasksCount = await context.ProjectTasks
+        .AsNoTracking()
+        .Where(t => context.Projects.Any(p => p.Id == t.ProjectId && p.OwnerUserId == userId) 
+                    && t.Status == Engitrack.Projects.Domain.Enums.TaskStatus.DONE)
+        .CountAsync(cancellationToken);
+    
+    return Results.Ok(new UserStatsResponse(
+        projectsCount,
+        tasksCount,
+        completedTasksCount
+    ));
+})
+.RequireAuthorization()
+.WithName("GetUserProfileStats")
+.WithTags("Users")
+.Produces<UserStatsResponse>(200);
+
 app.MapGet("/api/users/{id:guid}", async (Guid id, ProjectsDbContext context, ClaimsPrincipal user) =>
 {
     var currentUserId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);

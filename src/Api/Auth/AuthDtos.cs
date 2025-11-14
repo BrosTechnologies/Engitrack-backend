@@ -7,3 +7,4 @@ public record AuthResponse(Guid UserId, string Email, string Role, string Access
 // User Profile DTOs
 public record UserProfileResponse(Guid Id, string Email, string FullName, string Phone, string Role);
 public record UpdateUserProfileRequest(string FullName, string Phone);
+public record UserStatsResponse(int ProjectsCount, int TasksCount, int CompletedTasksCount);
