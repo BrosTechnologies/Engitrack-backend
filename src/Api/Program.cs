@@ -67,6 +67,7 @@ builder.Services.AddScoped<IValidator<RegisterTransactionRequest>, RegisterTrans
 builder.Services.AddScoped<IValidator<CreateWorkerRequest>, CreateWorkerRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateWorkerRequest>, UpdateWorkerRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateAssignmentRequest>, CreateAssignmentRequestValidator>();
+builder.Services.AddScoped<IValidator<AssignWorkerRequest>, AssignWorkerRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateAttendanceRequest>, CreateAttendanceRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateIncidentRequest>, CreateIncidentValidator>();
 builder.Services.AddScoped<IValidator<UpdateIncidentRequest>, UpdateIncidentValidator>();
@@ -1317,6 +1318,190 @@ app.MapDelete("/api/workers/{id:guid}", async (Guid id, ProjectsDbContext contex
 .WithName("DeleteWorker")
 .WithTags("Workers")
 .Produces(204)
+.Produces(404)
+.Produces(403);
+
+// Worker-Project Assignment endpoints
+app.MapGet("/api/projects/{projectId:guid}/workers", async (Guid projectId, ProjectsDbContext context, ICurrentUser currentUser) =>
+{
+    if (!currentUser.IsAuthenticated)
+        return Results.Unauthorized();
+
+    // Check if project exists and user owns it
+    var project = await context.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
+    if (project == null)
+        return Results.NotFound(new { error = "Project not found" });
+
+    if (project.OwnerUserId != currentUser.Id)
+        return Results.Forbid();
+
+    var assignments = await context.Assignments
+        .AsNoTracking()
+        .Include(a => a.Worker)
+        .Where(a => a.ProjectId == projectId)
+        .ToListAsync();
+
+    var response = assignments.Select(a => new ProjectWorkerResponse(
+        a.Worker!.Id,
+        a.Worker.FullName,
+        a.Worker.DocumentNumber,
+        a.Worker.Phone,
+        a.Worker.Position,
+        a.Worker.HourlyRate,
+        a.Id,
+        a.StartDate,
+        a.EndDate
+    ));
+
+    return Results.Ok(response);
+})
+.RequireAuthorization()
+.WithName("GetProjectWorkers")
+.WithTags("Workers")
+.Produces<IEnumerable<ProjectWorkerResponse>>(200)
+.Produces(404)
+.Produces(403);
+
+app.MapPost("/api/projects/{projectId:guid}/workers", async (Guid projectId, AssignWorkerRequest request, IValidator<AssignWorkerRequest> validator, ProjectsDbContext context, ICurrentUser currentUser) =>
+{
+    if (!currentUser.IsAuthenticated)
+        return Results.Unauthorized();
+
+    var validationResult = await validator.ValidateAsync(request);
+    if (!validationResult.IsValid)
+        return Results.BadRequest(validationResult.Errors.Select(e => new { Property = e.PropertyName, Error = e.ErrorMessage }));
+
+    // Check if project exists and user owns it
+    var project = await context.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
+    if (project == null)
+        return Results.NotFound(new { error = "Project not found" });
+
+    if (project.OwnerUserId != currentUser.Id)
+        return Results.Forbid();
+
+    // Check if worker exists
+    var worker = await context.Workers.FirstOrDefaultAsync(w => w.Id == request.WorkerId);
+    if (worker == null)
+        return Results.BadRequest(new { error = "Worker not found" });
+
+    // Check if worker is already assigned to this project (active assignment)
+    var existingAssignment = await context.Assignments
+        .FirstOrDefaultAsync(a => a.WorkerId == request.WorkerId && a.ProjectId == projectId && a.EndDate == null);
+    
+    if (existingAssignment != null)
+        return Results.BadRequest(new { error = "Worker is already assigned to this project" });
+
+    try
+    {
+        var assignment = new Assignment(request.WorkerId, projectId, request.StartDate);
+        if (request.EndDate.HasValue)
+            assignment.EndAssignment(request.EndDate.Value);
+
+        context.Assignments.Add(assignment);
+        await context.SaveChangesAsync();
+
+        var response = new ProjectWorkerResponse(
+            worker.Id,
+            worker.FullName,
+            worker.DocumentNumber,
+            worker.Phone,
+            worker.Position,
+            worker.HourlyRate,
+            assignment.Id,
+            assignment.StartDate,
+            assignment.EndDate
+        );
+
+        return Results.Created($"/api/projects/{projectId}/workers/{worker.Id}", response);
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }
+})
+.RequireAuthorization()
+.WithName("AssignWorkerToProject")
+.WithTags("Workers")
+.Accepts<AssignWorkerRequest>("application/json")
+.Produces<ProjectWorkerResponse>(201)
+.Produces(400)
+.Produces(404)
+.Produces(403);
+
+app.MapDelete("/api/projects/{projectId:guid}/workers/{workerId:guid}", async (Guid projectId, Guid workerId, ProjectsDbContext context, ICurrentUser currentUser) =>
+{
+    if (!currentUser.IsAuthenticated)
+        return Results.Unauthorized();
+
+    // Check if project exists and user owns it
+    var project = await context.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
+    if (project == null)
+        return Results.NotFound(new { error = "Project not found" });
+
+    if (project.OwnerUserId != currentUser.Id)
+        return Results.Forbid();
+
+    // Find active assignment
+    var assignment = await context.Assignments
+        .FirstOrDefaultAsync(a => a.WorkerId == workerId && a.ProjectId == projectId && a.EndDate == null);
+
+    if (assignment == null)
+        return Results.NotFound(new { error = "Active assignment not found" });
+
+    // End the assignment
+    assignment.EndAssignment(DateOnly.FromDateTime(DateTime.UtcNow));
+    await context.SaveChangesAsync();
+
+    return Results.NoContent();
+})
+.RequireAuthorization()
+.WithName("RemoveWorkerFromProject")
+.WithTags("Workers")
+.Produces(204)
+.Produces(404)
+.Produces(403);
+
+app.MapGet("/api/workers/{id:guid}/assignments", async (Guid id, ProjectsDbContext context, ICurrentUser currentUser) =>
+{
+    if (!currentUser.IsAuthenticated)
+        return Results.Unauthorized();
+
+    // Check if worker exists
+    var worker = await context.Workers.FirstOrDefaultAsync(w => w.Id == id);
+    if (worker == null)
+        return Results.NotFound(new { error = "Worker not found" });
+
+    // Check if user has access to this worker (owns any project the worker is assigned to)
+    var hasAccess = await context.Assignments
+        .AnyAsync(a => a.WorkerId == id && 
+                      context.Projects.Any(p => p.Id == a.ProjectId && p.OwnerUserId == currentUser.Id));
+
+    if (!hasAccess)
+        return Results.Forbid();
+
+    var assignments = await context.Assignments
+        .AsNoTracking()
+        .Where(a => a.WorkerId == id)
+        .Join(context.Projects,
+              assignment => assignment.ProjectId,
+              project => project.Id,
+              (assignment, project) => new { assignment, project })
+        .Where(x => x.project.OwnerUserId == currentUser.Id)
+        .Select(x => new WorkerAssignmentResponse(
+            x.assignment.Id,
+            x.project.Id,
+            x.project.Name,
+            x.assignment.StartDate,
+            x.assignment.EndDate
+        ))
+        .ToListAsync();
+
+    return Results.Ok(assignments);
+})
+.RequireAuthorization()
+.WithName("GetWorkerAssignments")
+.WithTags("Workers")
+.Produces<IEnumerable<WorkerAssignmentResponse>>(200)
 .Produces(404)
 .Produces(403);
 

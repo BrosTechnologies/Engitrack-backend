@@ -69,6 +69,29 @@ public record AssignmentResponse(
     DateOnly StartDate,
     DateOnly? EndDate);
 
+public record ProjectWorkerResponse(
+    Guid WorkerId,
+    string FullName,
+    string DocumentNumber,
+    string Phone,
+    string Position,
+    decimal HourlyRate,
+    Guid AssignmentId,
+    DateOnly StartDate,
+    DateOnly? EndDate);
+
+public record AssignWorkerRequest(
+    Guid WorkerId,
+    DateOnly StartDate,
+    DateOnly? EndDate = null);
+
+public record WorkerAssignmentResponse(
+    Guid AssignmentId,
+    Guid ProjectId,
+    string ProjectName,
+    DateOnly StartDate,
+    DateOnly? EndDate);
+
 public record AttendanceResponse(
     Guid Id,
     Guid WorkerId,
