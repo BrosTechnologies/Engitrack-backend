@@ -53,6 +53,7 @@ public class ProjectsDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).HasDefaultValueSql("NEWSEQUENTIALID()").ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasMaxLength(160).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500).IsRequired(false);
             entity.Property(e => e.StartDate).IsRequired();
             entity.Property(e => e.EndDate);
             entity.Property(e => e.Budget).HasPrecision(14, 2);
