@@ -1117,12 +1117,11 @@ app.MapGet("/api/workers", async (ProjectsDbContext context, ICurrentUser curren
     if (!currentUser.IsAuthenticated)
         return Results.Unauthorized();
 
-    var query = context.Workers
+    // Devolver TODOS los workers sin filtrar por asignaciones o proyectos
+    var workers = await context.Workers
         .AsNoTracking()
         .Include(w => w.Assignments)
-        .Where(w => w.Assignments.Any(a => context.Projects.Any(p => p.Id == a.ProjectId && p.OwnerUserId == currentUser.Id)));
-
-    var workers = await query
+        .OrderBy(w => w.FullName)
         .Skip((page - 1) * pageSize)
         .Take(pageSize)
         .ToListAsync();
@@ -1157,14 +1156,6 @@ app.MapGet("/api/workers/{id:guid}", async (Guid id, ProjectsDbContext context, 
     if (worker == null)
         return Results.NotFound();
 
-    // Check if user owns any project this worker is assigned to
-    var hasAccess = await context.Assignments
-        .AnyAsync(a => a.WorkerId == id && 
-                      context.Projects.Any(p => p.Id == a.ProjectId && p.OwnerUserId == currentUser.Id));
-
-    if (!hasAccess)
-        return Results.Forbid();
-
     var response = new WorkerResponse(
         worker.Id,
         worker.FullName,
@@ -1181,8 +1172,7 @@ app.MapGet("/api/workers/{id:guid}", async (Guid id, ProjectsDbContext context, 
 .WithName("GetWorker")
 .WithTags("Workers")
 .Produces<WorkerResponse>(200)
-.Produces(404)
-.Produces(403);
+.Produces(404);
 
 app.MapPost("/api/workers", async (CreateWorkerRequest request, IValidator<CreateWorkerRequest> validator, ProjectsDbContext context, ICurrentUser currentUser) =>
 {
@@ -1193,24 +1183,34 @@ app.MapPost("/api/workers", async (CreateWorkerRequest request, IValidator<Creat
     if (!validationResult.IsValid)
         return Results.BadRequest(validationResult.Errors.Select(e => new { Property = e.PropertyName, Error = e.ErrorMessage }));
 
-    // Check if user owns the project
-    var project = await context.Projects.FirstOrDefaultAsync(p => p.Id == request.ProjectId);
-    if (project == null)
-        return Results.BadRequest(new { error = "Project not found" });
+    // Si se proporciona ProjectId, validar que el proyecto existe y el usuario lo posee
+    if (request.ProjectId.HasValue)
+    {
+        var project = await context.Projects.FirstOrDefaultAsync(p => p.Id == request.ProjectId.Value);
+        if (project == null)
+            return Results.BadRequest(new { error = "Project not found" });
 
-    if (project.OwnerUserId != currentUser.Id)
-        return Results.Forbid();
+        if (project.OwnerUserId != currentUser.Id)
+            return Results.Forbid();
+    }
 
     try
     {
+        // Crear el worker siempre
         var worker = new Worker(request.FullName, request.DocumentNumber, request.Phone, request.Position, request.HourlyRate);
         context.Workers.Add(worker);
         await context.SaveChangesAsync();
 
-        // Create assignment
-        var assignment = new Assignment(worker.Id, request.ProjectId, DateOnly.FromDateTime(DateTime.Today));
-        context.Assignments.Add(assignment);
-        await context.SaveChangesAsync();
+        // Solo crear asignación si se proporcionó ProjectId
+        var assignments = new List<AssignmentDto>();
+        if (request.ProjectId.HasValue)
+        {
+            var assignment = new Assignment(worker.Id, request.ProjectId.Value, DateOnly.FromDateTime(DateTime.Today));
+            context.Assignments.Add(assignment);
+            await context.SaveChangesAsync();
+
+            assignments.Add(new AssignmentDto(assignment.Id, assignment.WorkerId, assignment.ProjectId, assignment.StartDate, assignment.EndDate));
+        }
 
         var response = new WorkerResponse(
             worker.Id,
@@ -1219,7 +1219,7 @@ app.MapPost("/api/workers", async (CreateWorkerRequest request, IValidator<Creat
             worker.Phone,
             worker.Position,
             worker.HourlyRate,
-            new[] { new AssignmentDto(assignment.Id, assignment.WorkerId, assignment.ProjectId, assignment.StartDate, assignment.EndDate) }
+            assignments
         );
 
         return Results.Created($"/api/workers/{worker.Id}", response);
@@ -1253,14 +1253,6 @@ app.MapPut("/api/workers/{id:guid}", async (Guid id, UpdateWorkerRequest request
     if (worker == null)
         return Results.NotFound();
 
-    // Check if user owns any project this worker is assigned to
-    var hasAccess = await context.Assignments
-        .AnyAsync(a => a.WorkerId == id && 
-                      context.Projects.Any(p => p.Id == a.ProjectId && p.OwnerUserId == currentUser.Id));
-
-    if (!hasAccess)
-        return Results.Forbid();
-
     try
     {
         worker.UpdateInfo(request.FullName, request.Phone, request.Position, request.HourlyRate);
@@ -1289,8 +1281,7 @@ app.MapPut("/api/workers/{id:guid}", async (Guid id, UpdateWorkerRequest request
 .Accepts<UpdateWorkerRequest>("application/json")
 .Produces<WorkerResponse>(200)
 .Produces(400)
-.Produces(404)
-.Produces(403);
+.Produces(404);
 
 app.MapDelete("/api/workers/{id:guid}", async (Guid id, ProjectsDbContext context, ICurrentUser currentUser) =>
 {
@@ -1301,14 +1292,6 @@ app.MapDelete("/api/workers/{id:guid}", async (Guid id, ProjectsDbContext contex
     if (worker == null)
         return Results.NotFound();
 
-    // Check if user owns any project this worker is assigned to
-    var hasAccess = await context.Assignments
-        .AnyAsync(a => a.WorkerId == id && 
-                      context.Projects.Any(p => p.Id == a.ProjectId && p.OwnerUserId == currentUser.Id));
-
-    if (!hasAccess)
-        return Results.Forbid();
-
     context.Workers.Remove(worker);
     await context.SaveChangesAsync();
 
@@ -1318,8 +1301,7 @@ app.MapDelete("/api/workers/{id:guid}", async (Guid id, ProjectsDbContext contex
 .WithName("DeleteWorker")
 .WithTags("Workers")
 .Produces(204)
-.Produces(404)
-.Produces(403);
+.Produces(404);
 
 // Worker-Project Assignment endpoints
 app.MapGet("/api/projects/{projectId:guid}/workers", async (Guid projectId, ProjectsDbContext context, ICurrentUser currentUser) =>

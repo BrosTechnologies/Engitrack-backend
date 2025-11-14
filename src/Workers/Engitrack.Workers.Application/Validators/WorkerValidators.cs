@@ -17,9 +17,6 @@ public class CreateWorkerRequestValidator : AbstractValidator<CreateWorkerReques
 
         RuleFor(x => x.HourlyRate)
             .GreaterThanOrEqualTo(0).WithMessage("HourlyRate cannot be negative");
-
-        RuleFor(x => x.ProjectId)
-            .NotEmpty().WithMessage("ProjectId is required");
     }
 }
 
