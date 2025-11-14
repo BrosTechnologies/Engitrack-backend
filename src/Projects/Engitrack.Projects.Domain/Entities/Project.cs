@@ -6,6 +6,7 @@ namespace Engitrack.Projects.Domain.Entities;
 public class Project : AggregateRoot
 {
     public string Name { get; private set; } = string.Empty;
+    public string? Description { get; private set; }
     public DateOnly StartDate { get; private set; }
     public DateOnly? EndDate { get; private set; }
     public decimal? Budget { get; private set; }
@@ -18,15 +19,19 @@ public class Project : AggregateRoot
 
     private Project() { } // EF Constructor
 
-    public Project(string name, DateOnly startDate, Guid ownerUserId, decimal? budget = null, Priority priority = Priority.MEDIUM)
+    public Project(string name, DateOnly startDate, Guid ownerUserId, string? description = null, decimal? budget = null, Priority priority = Priority.MEDIUM)
     {
         if (string.IsNullOrWhiteSpace(name) || name.Length > 160)
             throw new ArgumentException("Name is required and must be <= 160 characters", nameof(name));
+
+        if (!string.IsNullOrWhiteSpace(description) && description.Length > 500)
+            throw new ArgumentException("Description must be <= 500 characters", nameof(description));
 
         if (ownerUserId == Guid.Empty)
             throw new ArgumentException("OwnerUserId is required", nameof(ownerUserId));
 
         Name = name;
+        Description = description;
         StartDate = startDate;
         Budget = budget;
         Status = ProjectStatus.ACTIVE;
@@ -34,10 +39,13 @@ public class Project : AggregateRoot
         OwnerUserId = ownerUserId;
     }
 
-    public void UpdateBasicInfo(string name, DateOnly? endDate, decimal? budget, Priority? priority = null)
+    public void UpdateBasicInfo(string name, DateOnly? endDate, decimal? budget, Priority? priority = null, string? description = null)
     {
         if (string.IsNullOrWhiteSpace(name) || name.Length > 160)
             throw new ArgumentException("Name is required and must be <= 160 characters", nameof(name));
+
+        if (description != null && description.Length > 500)
+            throw new ArgumentException("Description must be <= 500 characters", nameof(description));
 
         Name = name;
         EndDate = endDate;
@@ -45,20 +53,29 @@ public class Project : AggregateRoot
         
         if (priority.HasValue)
             Priority = priority.Value;
+        
+        if (description != null)
+            Description = description;
             
         MarkAsUpdated();
     }
 
-    public void UpdateDetails(string name, decimal? budget, Priority? priority = null)
+    public void UpdateDetails(string name, decimal? budget, Priority? priority = null, string? description = null)
     {
         if (string.IsNullOrWhiteSpace(name) || name.Length > 160)
             throw new ArgumentException("Name is required and must be <= 160 characters", nameof(name));
+
+        if (description != null && description.Length > 500)
+            throw new ArgumentException("Description must be <= 500 characters", nameof(description));
 
         Name = name;
         Budget = budget;
         
         if (priority.HasValue)
             Priority = priority.Value;
+        
+        if (description != null)
+            Description = description;
             
         MarkAsUpdated();
     }

@@ -44,6 +44,11 @@ public class UpdateProjectRequestValidator : AbstractValidator<UpdateProjectRequ
             .NotEmpty()
             .MaximumLength(160);
 
+        RuleFor(x => x.Description)
+            .MaximumLength(500)
+            .When(x => !string.IsNullOrEmpty(x.Description))
+            .WithMessage("Description must be <= 500 characters");
+
         RuleFor(x => x.Budget)
             .GreaterThanOrEqualTo(0)
             .When(x => x.Budget.HasValue);

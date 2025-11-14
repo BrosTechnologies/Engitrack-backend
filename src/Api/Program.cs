@@ -245,6 +245,7 @@ app.MapGet("/api/projects", async (ProjectsDbContext context, ICurrentUser curre
         p.Budget,
         p.Status.ToString(),
         p.Priority.ToString(),
+        p.Description,
         p.OwnerUserId,
         p.Tasks.Select(t => new ProjectTaskDto(t.Id, p.Id, t.Title, t.Status.ToString(), t.DueDate))
     ));
@@ -281,6 +282,7 @@ app.MapGet("/api/projects/{id:guid}", async (Guid id, ProjectsDbContext context,
         project.Budget,
         project.Status.ToString(),
         project.Priority.ToString(),
+        project.Description,
         project.OwnerUserId,
         project.Tasks.Select(t => new ProjectTaskDto(t.Id, project.Id, t.Title, t.Status.ToString(), t.DueDate))
     );
@@ -313,7 +315,7 @@ app.MapPost("/api/projects", async (CreateProjectRequest request, IValidator<Cre
     var owner = currentUser.Id!.Value;
 
     // Create project
-    var project = new Project(request.Name, request.StartDate, owner, request.Budget, request.Priority ?? Priority.MEDIUM);
+    var project = new Project(request.Name, request.StartDate, owner, request.Description, request.Budget, request.Priority ?? Priority.MEDIUM);
 
     // Set EndDate if provided and valid
     if (request.EndDate.HasValue && request.EndDate >= request.StartDate)
@@ -342,6 +344,7 @@ app.MapPost("/api/projects", async (CreateProjectRequest request, IValidator<Cre
         project.Budget,
         project.Status.ToString(),
         project.Priority.ToString(),
+        project.Description,
         project.OwnerUserId,
         project.Tasks.Select(t => new ProjectTaskDto(t.Id, project.Id, t.Title, t.Status.ToString(), t.DueDate))
     );
@@ -477,6 +480,35 @@ app.MapDelete("/api/projects/{id:guid}/tasks/{taskId:guid}", async (Guid id, Gui
 .Produces(404)
 .Produces(403);
 
+app.MapDelete("/api/projects/{id:guid}", async (Guid id, ProjectsDbContext context, ICurrentUser currentUser) =>
+{
+    if (!currentUser.IsAuthenticated)
+        return Results.Unauthorized();
+
+    var project = await context.Projects
+        .Include(p => p.Tasks)
+        .FirstOrDefaultAsync(p => p.Id == id);
+
+    if (project == null)
+        return Results.NotFound("Project not found");
+
+    // SUPERVISOR and CONTRACTOR can delete any project, others only their own projects
+    if (currentUser.Role != "SUPERVISOR" && currentUser.Role != "CONTRACTOR" && project.OwnerUserId != currentUser.Id)
+        return Results.Forbid();
+
+    // Remove project and all related tasks (cascade delete is configured in EF)
+    context.Projects.Remove(project);
+    await context.SaveChangesAsync();
+
+    return Results.NoContent();
+})
+.RequireAuthorization()
+.WithName("DeleteProject")
+.WithTags("Projects")
+.Produces(204)
+.Produces(404)
+.Produces(403);
+
 app.MapPatch("/api/projects/{id:guid}/complete", async (Guid id, ProjectsDbContext context, ICurrentUser currentUser) =>
 {
     if (!currentUser.IsAuthenticated)
@@ -506,6 +538,7 @@ app.MapPatch("/api/projects/{id:guid}/complete", async (Guid id, ProjectsDbConte
             project.Budget,
             project.Status.ToString(),
             project.Priority.ToString(),
+            project.Description,
             project.OwnerUserId,
             project.Tasks.Select(t => new ProjectTaskDto(t.Id, project.Id, t.Title, t.Status.ToString(), t.DueDate))
         );
@@ -550,7 +583,7 @@ app.MapPatch("/api/projects/{id:guid}", async (Guid id, UpdateProjectRequest req
         return Results.BadRequest(new { error = "EndDate must be >= StartDate" });
 
     // Update project
-    project.UpdateDetails(request.Name, request.Budget, request.Priority);
+    project.UpdateDetails(request.Name, request.Budget, request.Priority, request.Description);
     if (request.EndDate.HasValue)
         project.SetEndDate(request.EndDate);
 
@@ -564,6 +597,7 @@ app.MapPatch("/api/projects/{id:guid}", async (Guid id, UpdateProjectRequest req
         project.Budget,
         project.Status.ToString(),
         project.Priority.ToString(),
+        project.Description,
         project.OwnerUserId,
         project.Tasks.Select(t => new ProjectTaskDto(t.Id, project.Id, t.Title, t.Status.ToString(), t.DueDate))
     );
@@ -608,6 +642,7 @@ app.MapPatch("/api/projects/{id:guid}/priority", async (Guid id, UpdatePriorityR
         project.Budget,
         project.Status.ToString(),
         project.Priority.ToString(),
+        project.Description,
         project.OwnerUserId,
         project.Tasks.Select(t => new ProjectTaskDto(t.Id, project.Id, t.Title, t.Status.ToString(), t.DueDate))
     );
@@ -664,6 +699,7 @@ app.MapPatch("/api/projects/{id:guid}/priority/string", async (Guid id, UpdatePr
         project.Budget,
         project.Status.ToString(),
         project.Priority.ToString(),
+        project.Description,
         project.OwnerUserId,
         project.Tasks.Select(t => new ProjectTaskDto(t.Id, project.Id, t.Title, t.Status.ToString(), t.DueDate))
     );
