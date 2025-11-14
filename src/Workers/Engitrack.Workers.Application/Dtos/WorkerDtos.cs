@@ -6,7 +6,7 @@ public record CreateWorkerRequest(
     string Phone,
     string Position,
     decimal HourlyRate,
-    Guid ProjectId);
+    Guid? ProjectId = null);
 
 public record UpdateWorkerRequest(
     string FullName,
