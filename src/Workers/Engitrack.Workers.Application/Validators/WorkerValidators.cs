@@ -70,3 +70,20 @@ public class CreateAttendanceRequestValidator : AbstractValidator<CreateAttendan
             .WithMessage("Status must be PRESENTE, AUSENTE, or JUSTIFICADO");
     }
 }
+
+public class AssignWorkerRequestValidator : AbstractValidator<AssignWorkerRequest>
+{
+    public AssignWorkerRequestValidator()
+    {
+        RuleFor(x => x.WorkerId)
+            .NotEmpty().WithMessage("WorkerId is required");
+
+        RuleFor(x => x.StartDate)
+            .NotEmpty().WithMessage("StartDate is required");
+
+        RuleFor(x => x.EndDate)
+            .GreaterThanOrEqualTo(x => x.StartDate)
+            .When(x => x.EndDate.HasValue)
+            .WithMessage("EndDate must be greater than or equal to StartDate");
+    }
+}
