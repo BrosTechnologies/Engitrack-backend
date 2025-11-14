@@ -1423,15 +1423,15 @@ app.MapDelete("/api/projects/{projectId:guid}/workers/{workerId:guid}", async (G
     if (project.OwnerUserId != currentUser.Id)
         return Results.Forbid();
 
-    // Find active assignment
+    // Find assignment for this project and worker
     var assignment = await context.Assignments
-        .FirstOrDefaultAsync(a => a.WorkerId == workerId && a.ProjectId == projectId && a.EndDate == null);
+        .FirstOrDefaultAsync(a => a.WorkerId == workerId && a.ProjectId == projectId);
 
     if (assignment == null)
-        return Results.NotFound(new { error = "Active assignment not found" });
+        return Results.NotFound(new { error = "Assignment not found" });
 
-    // End the assignment
-    assignment.EndAssignment(DateOnly.FromDateTime(DateTime.UtcNow));
+    // Remove the assignment completely
+    context.Assignments.Remove(assignment);
     await context.SaveChangesAsync();
 
     return Results.NoContent();
