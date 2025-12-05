@@ -10,6 +10,10 @@ public class User : Entity
     public string Phone { get; private set; } = string.Empty;
     public Role Role { get; private set; }
     public string PasswordHash { get; private set; } = string.Empty;
+    
+    // Password Reset fields
+    public string? PasswordResetToken { get; private set; }
+    public DateTime? PasswordResetTokenExpiry { get; private set; }
 
     private User() { } // EF Constructor
 
@@ -54,5 +58,26 @@ public class User : Entity
     {
         Role = newRole;
         MarkAsUpdated();
+    }
+
+    public void SetPasswordResetToken(string token, DateTime expiry)
+    {
+        PasswordResetToken = token;
+        PasswordResetTokenExpiry = expiry;
+        MarkAsUpdated();
+    }
+
+    public void ClearPasswordResetToken()
+    {
+        PasswordResetToken = null;
+        PasswordResetTokenExpiry = null;
+        MarkAsUpdated();
+    }
+
+    public bool IsPasswordResetTokenValid(string token)
+    {
+        return PasswordResetToken == token && 
+               PasswordResetTokenExpiry.HasValue && 
+               PasswordResetTokenExpiry.Value > DateTime.UtcNow;
     }
 }

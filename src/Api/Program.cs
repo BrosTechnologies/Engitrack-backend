@@ -26,6 +26,7 @@ using InventoryTx = Engitrack.Inventory.Domain.Transactions.InventoryTransaction
 using TxType = Engitrack.Inventory.Domain.Transactions.TxType;
 using BCrypt.Net;
 using Microsoft.Data.SqlClient;
+using Engitrack.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddScoped<JwtHelper>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddDbContext<ProjectsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
@@ -1309,12 +1311,13 @@ app.MapGet("/api/projects/{projectId:guid}/workers", async (Guid projectId, Proj
     if (!currentUser.IsAuthenticated)
         return Results.Unauthorized();
 
-    // Check if project exists and user owns it
+    // Check if project exists
     var project = await context.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
     if (project == null)
         return Results.NotFound(new { error = "Project not found" });
 
-    if (project.OwnerUserId != currentUser.Id)
+    // SUPERVISOR and CONTRACTOR can access any project, others only their own projects
+    if (currentUser.Role != "SUPERVISOR" && currentUser.Role != "CONTRACTOR" && project.OwnerUserId != currentUser.Id)
         return Results.Forbid();
 
     var assignments = await context.Assignments
@@ -1353,12 +1356,13 @@ app.MapPost("/api/projects/{projectId:guid}/workers", async (Guid projectId, Ass
     if (!validationResult.IsValid)
         return Results.BadRequest(validationResult.Errors.Select(e => new { Property = e.PropertyName, Error = e.ErrorMessage }));
 
-    // Check if project exists and user owns it
+    // Check if project exists
     var project = await context.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
     if (project == null)
         return Results.NotFound(new { error = "Project not found" });
 
-    if (project.OwnerUserId != currentUser.Id)
+    // SUPERVISOR and CONTRACTOR can manage any project, others only their own projects
+    if (currentUser.Role != "SUPERVISOR" && currentUser.Role != "CONTRACTOR" && project.OwnerUserId != currentUser.Id)
         return Results.Forbid();
 
     // Check if worker exists
@@ -1415,12 +1419,13 @@ app.MapDelete("/api/projects/{projectId:guid}/workers/{workerId:guid}", async (G
     if (!currentUser.IsAuthenticated)
         return Results.Unauthorized();
 
-    // Check if project exists and user owns it
+    // Check if project exists
     var project = await context.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
     if (project == null)
         return Results.NotFound(new { error = "Project not found" });
 
-    if (project.OwnerUserId != currentUser.Id)
+    // SUPERVISOR and CONTRACTOR can manage any project, others only their own projects
+    if (currentUser.Role != "SUPERVISOR" && currentUser.Role != "CONTRACTOR" && project.OwnerUserId != currentUser.Id)
         return Results.Forbid();
 
     // Find assignment for this project and worker
@@ -1778,6 +1783,77 @@ app.MapPost("/auth/login", async (LoginRequest request, ProjectsDbContext contex
 .Produces<AuthResponse>(200)
 .Produces(401);
 
+// Password Reset endpoints
+app.MapPost("/auth/forgot-password", async (ForgotPasswordRequest request, ProjectsDbContext context, IEmailService emailService) =>
+{
+    try
+    {
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        
+        // Always return success message to avoid revealing if email exists
+        if (user == null)
+            return Results.Ok(new ForgotPasswordResponse("Si el correo existe, se enviará un código de verificación."));
+
+        // Generate 6-digit code
+        var code = new Random().Next(100000, 999999).ToString();
+        
+        // Set token with 15 minutes expiry
+        user.SetPasswordResetToken(code, DateTime.UtcNow.AddMinutes(15));
+        await context.SaveChangesAsync();
+
+        // Send email
+        await emailService.SendPasswordResetEmailAsync(user.Email, code);
+
+        return Results.Ok(new ForgotPasswordResponse("Si el correo existe, se enviará un código de verificación."));
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Error al procesar la solicitud: {ex.Message}");
+    }
+})
+.WithName("ForgotPassword")
+.WithTags("Auth")
+.Accepts<ForgotPasswordRequest>("application/json")
+.Produces<ForgotPasswordResponse>(200);
+
+app.MapPost("/auth/verify-reset-code", async (VerifyResetCodeRequest request, ProjectsDbContext context) =>
+{
+    var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+    
+    if (user == null || !user.IsPasswordResetTokenValid(request.Code))
+        return Results.Ok(new VerifyResetCodeResponse(false));
+
+    return Results.Ok(new VerifyResetCodeResponse(true));
+})
+.WithName("VerifyResetCode")
+.WithTags("Auth")
+.Accepts<VerifyResetCodeRequest>("application/json")
+.Produces<VerifyResetCodeResponse>(200);
+
+app.MapPost("/auth/reset-password", async (ResetPasswordRequest request, ProjectsDbContext context) =>
+{
+    var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+    
+    if (user == null || !user.IsPasswordResetTokenValid(request.Code))
+        return Results.BadRequest(new { error = "Código inválido o expirado" });
+
+    // Validate new password
+    if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
+        return Results.BadRequest(new { error = "La contraseña debe tener al menos 6 caracteres" });
+
+    // Update password and clear reset token
+    user.SetPassword(BCrypt.Net.BCrypt.HashPassword(request.NewPassword));
+    user.ClearPasswordResetToken();
+    await context.SaveChangesAsync();
+
+    return Results.Ok(new { message = "Contraseña actualizada exitosamente" });
+})
+.WithName("ResetPassword")
+.WithTags("Auth")
+.Accepts<ResetPasswordRequest>("application/json")
+.Produces(200)
+.Produces(400);
+
 // User profile endpoints
 app.MapGet("/api/users/profile", async (ProjectsDbContext context, ClaimsPrincipal user) =>
 {
@@ -1943,6 +2019,41 @@ app.MapPatch("/api/users/profile", async (UpdateUserProfileRequest request, Proj
 .WithTags("Users")
 .Accepts<UpdateUserProfileRequest>("application/json")
 .Produces<UserProfileResponse>(200)
+.Produces(400)
+.Produces(404);
+
+// Change password for logged-in users
+app.MapPost("/api/users/change-password", async (ChangePasswordRequest request, ProjectsDbContext context, ClaimsPrincipal user) =>
+{
+    var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+    
+    var userProfile = await context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+    if (userProfile == null)
+        return Results.NotFound(new { error = "Usuario no encontrado" });
+
+    // Verify current password
+    if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, userProfile.PasswordHash))
+        return Results.BadRequest(new { error = "La contraseña actual es incorrecta" });
+
+    // Validate new password
+    if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
+        return Results.BadRequest(new { error = "La nueva contraseña debe tener al menos 6 caracteres" });
+
+    // Check that new password is different from current
+    if (request.CurrentPassword == request.NewPassword)
+        return Results.BadRequest(new { error = "La nueva contraseña debe ser diferente a la actual" });
+
+    // Update password
+    userProfile.SetPassword(BCrypt.Net.BCrypt.HashPassword(request.NewPassword));
+    await context.SaveChangesAsync();
+
+    return Results.Ok(new { message = "Contraseña actualizada exitosamente" });
+})
+.RequireAuthorization()
+.WithName("ChangePassword")
+.WithTags("Users")
+.Accepts<ChangePasswordRequest>("application/json")
+.Produces(200)
 .Produces(400)
 .Produces(404);
 

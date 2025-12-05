@@ -8,3 +8,13 @@ public record AuthResponse(Guid UserId, string Email, string Role, string Access
 public record UserProfileResponse(Guid Id, string Email, string FullName, string Phone, string Role);
 public record UpdateUserProfileRequest(string FullName, string Phone);
 public record UserStatsResponse(int ProjectsCount, int TasksCount, int CompletedTasksCount);
+
+// Password Reset DTOs
+public record ForgotPasswordRequest(string Email);
+public record ForgotPasswordResponse(string Message);
+public record VerifyResetCodeRequest(string Email, string Code);
+public record VerifyResetCodeResponse(bool Valid);
+public record ResetPasswordRequest(string Email, string Code, string NewPassword);
+
+// Change Password DTO (for logged-in users)
+public record ChangePasswordRequest(string CurrentPassword, string NewPassword);
