@@ -15,3 +15,6 @@ public record ForgotPasswordResponse(string Message);
 public record VerifyResetCodeRequest(string Email, string Code);
 public record VerifyResetCodeResponse(bool Valid);
 public record ResetPasswordRequest(string Email, string Code, string NewPassword);
+
+// Change Password DTO (for logged-in users)
+public record ChangePasswordRequest(string CurrentPassword, string NewPassword);

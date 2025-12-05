@@ -2022,6 +2022,41 @@ app.MapPatch("/api/users/profile", async (UpdateUserProfileRequest request, Proj
 .Produces(400)
 .Produces(404);
 
+// Change password for logged-in users
+app.MapPost("/api/users/change-password", async (ChangePasswordRequest request, ProjectsDbContext context, ClaimsPrincipal user) =>
+{
+    var userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+    
+    var userProfile = await context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+    if (userProfile == null)
+        return Results.NotFound(new { error = "Usuario no encontrado" });
+
+    // Verify current password
+    if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, userProfile.PasswordHash))
+        return Results.BadRequest(new { error = "La contraseña actual es incorrecta" });
+
+    // Validate new password
+    if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
+        return Results.BadRequest(new { error = "La nueva contraseña debe tener al menos 6 caracteres" });
+
+    // Check that new password is different from current
+    if (request.CurrentPassword == request.NewPassword)
+        return Results.BadRequest(new { error = "La nueva contraseña debe ser diferente a la actual" });
+
+    // Update password
+    userProfile.SetPassword(BCrypt.Net.BCrypt.HashPassword(request.NewPassword));
+    await context.SaveChangesAsync();
+
+    return Results.Ok(new { message = "Contraseña actualizada exitosamente" });
+})
+.RequireAuthorization()
+.WithName("ChangePassword")
+.WithTags("Users")
+.Accepts<ChangePasswordRequest>("application/json")
+.Produces(200)
+.Produces(400)
+.Produces(404);
+
 // ===== INCIDENTS ENDPOINTS =====
 
 app.MapGet("/api/projects/{projectId:guid}/incidents", async (
